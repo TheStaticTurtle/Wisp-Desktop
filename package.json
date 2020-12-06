@@ -1,0 +1,76 @@
+{
+  "name": "whisper_book",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A simple electron based audio book player",
+  "author": {
+    "name": "TheStaticTurtle"
+  },
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "main": "background.js",
+  "dependencies": {
+    "@types/node": "^14.14.10",
+    "bookshelf": "^1.2.0",
+    "bootstrap": "^4.5.3",
+    "core-js": "^3.6.5",
+    "jquery": "^3.5.1",
+    "knex": "^0.21.12",
+    "music-metadata": "^7.5.1",
+    "nedb": "^1.8.0",
+    "nedb-promises": "^4.1.0",
+    "popper.js": "^1.16.1",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0",
+    "typeorm": "^0.2.29",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "babel-eslint": "^10.1.0",
+    "electron": "^11.0.3",
+    "electron-devtools-installer": "^3.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "_id": "whisper_book@1.0.0",
+  "keywords": [
+    "audio",
+    "book"
+  ],
+  "license": "GPLv3",
+  "readme": "ERROR: No README data found!"
+}
