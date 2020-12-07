@@ -1,4 +1,6 @@
+/*
 'use strict';
+
 const { app, BrowserWindow, dialog, ipcMain  } = require('electron')
 
 const firstStartupController = require("./controllers/first_startup")
@@ -29,16 +31,6 @@ const db = {
 	sequelize: sequelize
 }
 
-
-/*
-db.models.Book.sync().then(() => {
-	return db.models.Book.create({
-		name: 'Test 001',
-	});
-});
-db.models.Book.findAll().then(products => {
-	console.log(products)
-})*/
 
 function create_first_load_window() {
 	const main_window = new BrowserWindow({

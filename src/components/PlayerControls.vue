@@ -56,11 +56,7 @@
 				return a+":"+b
 			},
 			getProgressPercentage() {
-				console.log(this.player.chapter_duration)
-				console.log( this.player.chapter_position)
-				const a = Math.floor(this.player.chapter_duration / this.player.chapter_position * 100);
-				console.log(a);
-				return a;
+				return Math.floor(this.player.chapter_position / this.player.chapter_duration * 100);
 			}
 		},
 		props: {

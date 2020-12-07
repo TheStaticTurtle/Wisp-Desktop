@@ -4,7 +4,7 @@
             <div class="card" style="border-width: 1px;border-color: #151515;">
                 <img class="img-fluid card-img-top w-100 d-block" v-bind:src="image_url">
                 <div class="card-body text-center text-white" style="padding-top: 6px;padding-bottom: 0px;padding-left: 7px;padding-right: 6px;background: #1f1f1f;">
-                    <h5 class="card-title">{{ title }}</h5>
+                    <p class="card-title" style="font-weight: lighter">{{ title }}</p>
                 </div>
             </div>
         </button>
