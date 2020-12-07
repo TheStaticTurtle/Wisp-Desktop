@@ -4,7 +4,7 @@
 		<hr class="d-flex" style="background: #ffffff;width: 100%;">
 		<div class="row no-gutters d-flex flex-grow-1" style="overflow-y: scroll;height: 1px;margin-bottom: 15px;">
 
-			<LibraryItem v-for="book in books" :key="book.id" :title="book.title" :image_url="book.image_url" :id="book.id"></LibraryItem>
+			<LibraryItem v-for="book in books" :key="book.id" :name="book.name" :picture_url="book.picture_url" :id="book.id"></LibraryItem>
 
 
 

@@ -28,6 +28,7 @@
     "music-metadata": "^7.5.1",
     "nedb": "^1.8.0",
     "nedb-promises": "^4.1.0",
+    "node-recursive-directory": "git+https://github.com/vvmspace/node-recursive-directory.git",
     "popper.js": "^1.16.1",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.3.5",
