@@ -164,6 +164,7 @@ function reloadLibrary(db, event) {
 
 function controller(db) {
 	ipcMain.on("force_reload",function (event, arg) {
+		event.sender.send("loading", "loading");
 		reloadLibrary(db, event).then(function () {
 			event.sender.send("end_loading", "Reload finished");
 		}).catch(function (err) {
@@ -173,6 +174,7 @@ function controller(db) {
 	});
 
 	ipcMain.on("force_resync",function (event, arg) {
+		event.sender.send("loading", "loading");
 		resyncLibraries(db, event).then(function () {
 			event.sender.send("end_loading", "Sync finished");
 		}).catch(function (err) {
@@ -193,7 +195,7 @@ function controller(db) {
 				db.models.Library.create({
 					path: r.filePaths[0],
 				}).then(function () {
-					event.sender.send("end_loading", "Starting to sync the new library");
+					event.sender.send("library_load_text", "Starting to sync the new library");
 					resyncLibraries(db, event).then(function () {
 						event.sender.send("end_loading", "Sync finished");
 					}).catch(function (err) {
@@ -201,7 +203,7 @@ function controller(db) {
 						event.sender.send("end_loading", "Error while syncing: "+err);
 					})
 				}).catch(function () {
-					event.sender.send("end_loading", "This library already exist. It will resync it tho");
+					event.sender.send("library_load_text", "This library already exist. It will resync it tho");
 					resyncLibraries(db, event).then(function () {
 						event.sender.send("end_loading", "Sync finished");
 					}).catch(function (err) {

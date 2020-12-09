@@ -50,19 +50,21 @@
 			const t = this
 			this.$electron.ipcRenderer.send("force_reload");
 
-			this.$electron.ipcRenderer.on('library_load', (event, arg) => {
+			this.$electron.ipcRenderer.on('library_load', () => {
 				t.loading_text = "";
-				switch (arg) {
+				/*switch (arg) {
 					case "start":
 						t.is_loading = true;
 						break;
 					default:
 						t.is_loading = false
 						break;
-				}
+				}*/
 			})
-			this.$electron.ipcRenderer.on('end_loading', (event, arg) => {
-				console.log(arg)
+			this.$electron.ipcRenderer.on('loading', () => {
+				t.is_loading = true;
+			})
+			this.$electron.ipcRenderer.on('end_loading', () => {
 				t.is_loading = false;
 			})
 
@@ -70,6 +72,7 @@
 				t.loading_text = arg
 			})
 			this.$electron.ipcRenderer.on('library_update', (event, arg) => {
+				this.current_view = 'LIBRARY'
 				t.books = arg;
 			})
 

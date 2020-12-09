@@ -21,13 +21,13 @@
 		props: {
 			picture_url: String,
 			name: String,
-			id: Number
+			id: Number,
 		},
 		methods: {
 			click() {
 				this.$emit('libraryBookClick', this.id)
 			}
-		}
+		},
 	}
 </script>
 
