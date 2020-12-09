@@ -1,14 +1,17 @@
 <template>
 	<div class="container-fluid d-flex flex-column" style="height: 100%;">
 		<div class="row flex-grow-1">
-			<PlayerNavigation v-if="!is_loading" :display_player_related="display_player" :player="player"></PlayerNavigation>
-			<PlayerLibrary v-if="!is_loading" :books="books"></PlayerLibrary>
+			<template  v-if="!is_loading">
+				<PlayerNavigation :display_player_related="display_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
+				<PlayerLibrary v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
+				<PlayerBook v-if="current_view === 'BOOK'" :book="book_view_display_which_book"></PlayerBook>
+			</template >
 
 			<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
-		<PlayerControls v-if="display_player" :player="player"></PlayerControls>
+		<PlayerControls v-if="display_controls" :player="player"></PlayerControls>
 	</div>
 </template>
 
@@ -17,13 +20,32 @@
 	import PlayerLibrary from "./PlayerLibrary";
 	import PlayerNavigation from "./PlayerNavigation";
 	import Loading from "./Loading";
+	import PlayerBook from "./PlayerBook";
+
+
 
 	export default {
 		name: 'Player',
-		components: {Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
+		components: {PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
 		/*props: {
           msg: String
         }*/
+		methods: {
+			libraryBookClick(arg) {
+				this.book_view_display_which_book = this.books[Math.max(Math.min(arg,this.books.length-1),0)];
+				this.current_view = 'BOOK'
+			},
+			navigationClick(arg) {
+				switch (arg) {
+					case "HOME":
+						this.current_view = 'LIBRARY'
+						break;
+					default:
+						console.log(arg)
+						break;
+				}
+			}
+		},
 		mounted() {
 			const t = this
 			this.$electron.ipcRenderer.send("force_reload");
@@ -48,15 +70,22 @@
 				t.loading_text = arg
 			})
 			this.$electron.ipcRenderer.on('library_update', (event, arg) => {
-				t.books = arg
+				t.books = arg;
 			})
 
 		},
 		data() {
 			return {
-				display_player: true,
+				current_view: 'LIBRARY',
+
+				display_controls: true,
+
 				is_loading: false,
 				loading_text: "",
+
+				book_view_display_which_book: null,
+
+
 				books: [
 					/*{
 						name: "HP01: Harry Potter And The Sorcerer Stone",

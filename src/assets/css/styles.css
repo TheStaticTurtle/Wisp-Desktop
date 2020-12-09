@@ -20,3 +20,25 @@
   background: #bbb;
 }
 
+.table thead > tr.custom_tr_head.custom_tr_head > th {
+  border-bottom: 1px solid rgb(135,135,135);
+  border-top: initial;
+}
+
+.table tbody > tr.custom_tr_body.custom_tr_body > td {
+  border-bottom: 1px solid rgb(92,92,92);
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: rgb(40,40,40);
+  color: white;
+}
+
+.white-hover:hove {
+  color: white;
+}
+
+.white-hover:hover {
+  color: white !important;
+}
+
