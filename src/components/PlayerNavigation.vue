@@ -8,6 +8,12 @@
 				<div class="row" style="padding: 8px;padding-bottom: 4px;">
 					<div class="col"><a class="text-light no-underline" href="#" style="font-size: 25px;"><i class="icon-magnifier" style="margin-right: 20px;"></i>Search</a></div>
 				</div>
+				<div class="row" style="padding: 8px;padding-bottom: 4px;">
+					<div class="col"><a @click="reload_library" class="text-light no-underline" href="#" style="font-size: 25px;"><i class="icon-reload" style="margin-right: 20px;"></i>Reload</a></div>
+				</div>
+				<div class="row" style="padding: 8px;padding-bottom: 4px;">
+					<div class="col"><a @click="resync_library" class="text-light no-underline" href="#" style="font-size: 25px;"><i class="icon-refresh" style="margin-right: 20px;"></i>Resync</a></div>
+				</div>
 			</div>
 		</div>
 		<div v-if="display_player_related" class="row">
@@ -22,6 +28,14 @@
 <script>
 	export default {
 		name: "PlayerNavigation",
+		methods: {
+			reload_library() {
+				this.$electron.ipcRenderer.send("force_reload");
+			},
+			resync_library() {
+				this.$electron.ipcRenderer.send("force_resync");
+			}
+		},
 		props: {
 			display_player_related: Boolean,
 			player: Object,

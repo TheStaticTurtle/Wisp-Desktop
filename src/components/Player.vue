@@ -26,7 +26,10 @@
         }*/
 		mounted() {
 			const t = this
+			this.$electron.ipcRenderer.send("force_reload");
+
 			this.$electron.ipcRenderer.on('library_load', (event, arg) => {
+				t.loading_text = "";
 				switch (arg) {
 					case "start":
 						t.is_loading = true;
@@ -36,6 +39,11 @@
 						break;
 				}
 			})
+			this.$electron.ipcRenderer.on('end_loading', (event, arg) => {
+				console.log(arg)
+				t.is_loading = false;
+			})
+
 			this.$electron.ipcRenderer.on('library_load_text', (event, arg) => {
 				t.loading_text = arg
 			})

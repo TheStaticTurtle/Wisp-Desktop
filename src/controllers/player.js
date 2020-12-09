@@ -57,9 +57,7 @@ function globPromise (dir, asObject = false) {
 
 
 function resyncLibraries(db, event) {
-
 	return new Promise(function(resolve, reject) {
-
 		db.models.Library.findAll().then(async (results)=> {
 			event.sender.send("library_load", "start");
 
@@ -78,11 +76,13 @@ function resyncLibraries(db, event) {
 						books[file_data.common.album] = {
 							name: file_data.common.album,
 							picture: null,
+							border_color: "#1f1f1f",
 							chapters: [],
 						}
 					}
 
 					books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
+
 
 					books[file_data.common.album].chapters.push({
 						file_path: walk_results[i],
@@ -102,18 +102,12 @@ function resyncLibraries(db, event) {
 			for (let i = 0; i < books_organized.length; i++) books_organized[i].chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
 
 
-			console.log(books_organized[0].picture)
-
 			await db.models.Chapter.destroy({
 				truncate: true
 			});
 			await db.models.Book.destroy({
 				truncate: true
 			});
-
-			console.log(books_organized)
-
-
 
 			for (let i = 0; i < books_organized.length; i++) {
 				let b = books_organized[i]
@@ -131,10 +125,62 @@ function resyncLibraries(db, event) {
 		}).catch(reject);
 
 	})
+}
+
+
+function reloadLibrary(db, event) {
+	return new Promise(function(resolve, reject) {
+		db.models.Book.findAll({ include: db.models.Chapter }).then(async (results)=> {
+			event.sender.send("library_load", "start");
+
+			// Remap it correctly
+			results = results.map(book => {
+				return {
+					name: book.name,
+					picture_url: book.picture_url,
+					border_color: book.border_color,
+					chapters: book.chapters.map(chapter => {
+						return {
+							file_path: chapter.file_path,
+							chapter_no: chapter.chapter_no,
+							chapter_name: chapter.chapter_name,
+							chapter_artist: chapter.chapter_artist,
+						}
+					}),
+				}
+			});
+
+			event.sender.send("library_load", "stop");
+			event.sender.send("library_update", results);
+			resolve();
+
+
+		}).catch(reject);
+
+	})
 
 }
 
+
 function controller(db) {
+	ipcMain.on("force_reload",function (event, arg) {
+		reloadLibrary(db, event).then(function () {
+			event.sender.send("end_loading", "Reload finished");
+		}).catch(function (err) {
+			console.error(err)
+			event.sender.send("end_loading", "Error while reloading: "+err);
+		});
+	});
+
+	ipcMain.on("force_resync",function (event, arg) {
+		resyncLibraries(db, event).then(function () {
+			event.sender.send("end_loading", "Sync finished");
+		}).catch(function (err) {
+			console.error(err)
+			event.sender.send("end_loading", "Error while syncing: "+err);
+		});
+	});
+
 	ipcMain.on("add_new_library",function (event, arg) {
 
 		dialog.showOpenDialog({properties: ['openDirectory']}).then(r => {
@@ -151,14 +197,16 @@ function controller(db) {
 					resyncLibraries(db, event).then(function () {
 						event.sender.send("end_loading", "Sync finished");
 					}).catch(function (err) {
-						event.sender.send("end_loading", "Error while syncing");
+						console.error(err)
+						event.sender.send("end_loading", "Error while syncing: "+err);
 					})
 				}).catch(function () {
 					event.sender.send("end_loading", "This library already exist. It will resync it tho");
 					resyncLibraries(db, event).then(function () {
 						event.sender.send("end_loading", "Sync finished");
 					}).catch(function (err) {
-						event.sender.send("end_loading", "Error while syncing");
+						console.error(err)
+						event.sender.send("end_loading", "Error while syncing: "+err);
 					})
 				});
 			});

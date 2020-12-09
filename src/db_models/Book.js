@@ -4,9 +4,13 @@ module.exports = function(sequelize, DataTypes) {
 	// Define resource
 	var Book = sequelize.define('book', {
 		name: {
-			type: DataTypes.STRING
+			type: DataTypes.STRING,
+			unique: true
 		},
 		picture_url: {
+			type: DataTypes.STRING
+		},
+		border_color: {
 			type: DataTypes.STRING
 		},
 	});
