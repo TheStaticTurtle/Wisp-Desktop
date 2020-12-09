@@ -3,31 +3,18 @@ const path = require('path');
 const glob = require("glob");
 const fs = require('fs');
 const mm = require('music-metadata');
+const dataurl = require('dataurl');
 
-/*
-const walk = function(dir, done) {
-	let results = [];
-	fs.readdir(dir, function(err, list) {
-		if (err) return done(err);
-		let i = 0;
-		(function next() {
-			let file = list[i++];
-			if (!file) return done(null, results);
-			file = path.resolve(dir, file);
-			fs.stat(file, function(err, stat) {
-				if (stat && stat.isDirectory()) {
-					walk(file, function(err, res) {
-						results = results.concat(res);
-						next();
-					});
-				} else {
-					results.push(file);
-					next();
-				}
-			});
-		})();
+const convertSong = (filePath) => {
+	return new Promise((resolve, reject) => {
+		fs.readFile(filePath, (err, data) => {
+			if (err) {
+				reject(err);
+			}
+			resolve(dataurl.convert({data, mimetype: 'audio/mp3'}));
+		});
 	});
-};*/
+};
 
 function globPromise (dir, asObject = false) {
 	return new Promise ((resolve, reject) => {
@@ -54,7 +41,6 @@ function globPromise (dir, asObject = false) {
 		})
 	})
 }
-
 
 function resyncLibraries(db, event) {
 	return new Promise(function(resolve, reject) {
@@ -121,13 +107,11 @@ function resyncLibraries(db, event) {
 			event.sender.send("library_load", "stop");
 
 			event.sender.send("library_update", books_organized);
-			resolve();
+			resolve(books_organized);
 		}).catch(reject);
 
 	})
 }
-
-
 function reloadLibrary(db, event) {
 	return new Promise(function(resolve, reject) {
 		db.models.Book.findAll({ include: db.models.Chapter }).then(async (results)=> {
@@ -152,7 +136,7 @@ function reloadLibrary(db, event) {
 
 			event.sender.send("library_load", "stop");
 			event.sender.send("library_update", results);
-			resolve();
+			resolve(results);
 
 
 		}).catch(reject);
@@ -161,12 +145,12 @@ function reloadLibrary(db, event) {
 
 }
 
-
-function controller(db) {
+function controller(db,audio) {
 	ipcMain.on("force_reload",function (event, arg) {
 		event.sender.send("loading", "loading");
 		reloadLibrary(db, event).then(function () {
 			event.sender.send("end_loading", "Reload finished");
+
 		}).catch(function (err) {
 			console.error(err)
 			event.sender.send("end_loading", "Error while reloading: "+err);
@@ -175,8 +159,11 @@ function controller(db) {
 
 	ipcMain.on("force_resync",function (event, arg) {
 		event.sender.send("loading", "loading");
-		resyncLibraries(db, event).then(function () {
+		resyncLibraries(db, event).then(function (books) {
 			event.sender.send("end_loading", "Sync finished");
+
+			event.sender.send("new_file", "C:/Users/tugle/Music/AudioBooks/Ready Player One/ch01.wav");
+
 		}).catch(function (err) {
 			console.error(err)
 			event.sender.send("end_loading", "Error while syncing: "+err);

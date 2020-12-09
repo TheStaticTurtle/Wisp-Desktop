@@ -1,9 +1,13 @@
 'use strict'
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain  } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
+
+const AudioPlayer = require("./controllers/AudioPlayer").AudioPlayer
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+const audio = new AudioPlayer();
 
 const fs = require('fs');
 const path = require('path');
@@ -33,7 +37,7 @@ const db = {
 sequelize.sync({ force: true })
 
 
-require("./controllers/player").controller(db)
+require("./controllers/player").controller(db,audio)
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
@@ -48,6 +52,7 @@ async function createWindow() {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: true, //process.env.ELECTRON_NODE_INTEGRATION
+      webSecurity: false, //Allow file loading via file://
     }
   })
 
@@ -83,6 +88,19 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+
+  const protocolName = 'safe-file-protocol'
+  protocol.registerFileProtocol(protocolName, (request, callback) => {
+    const url = request.url.replace(`${protocolName}://`, '')
+    try {
+      return callback(decodeURIComponent(url))
+    }
+    catch (error) {
+      // Handle the error as needed
+      console.error(error)
+    }
+  });
+
   createWindow()
 })
 

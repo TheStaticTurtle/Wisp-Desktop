@@ -22,7 +22,8 @@
 	import Loading from "./Loading";
 	import PlayerBook from "./PlayerBook";
 
-
+	//const Audio = require("./../controllers/AudioPlayer")
+	//const {Howl} = require('howler');
 
 	export default {
 		name: 'Player',
@@ -44,11 +45,46 @@
 						console.log(arg)
 						break;
 				}
+			},
+			change_file(file_path) {
+				if(this.sound!=null) this.sound.pause();
+				this.sound = new Audio("safe-file-protocol://"+file_path);
+				/*this.sound = new Howl({
+					src: ["safe-file-protocol://"+file_path],
+					autoplay: false,
+					loop: false,
+					html5: true,
+					volume: 0.5,
+					onstart: function() {
+						console.log('Started!');
+					},
+					onpause: function() {
+						console.log('Paused!');
+					},
+					onend: function() {
+						console.log('Finished!');
+					},
+					onseek : function(arg) {
+						console.log('Seek: '+arg);
+					}
+				});*/
+				this.sound.addEventListener('canplaythrough', function () {
+					console.log("now")
+				});
+				return this.sound
 			}
 		},
 		mounted() {
+
 			const t = this
 			this.$electron.ipcRenderer.send("force_reload");
+
+			this.$electron.ipcRenderer.on('new_file', (e, data) => {
+				this.change_file(data)
+				console.log("START")
+				this.sound.play()
+				console.log("STARTE")
+			})
 
 			this.$electron.ipcRenderer.on('library_load', () => {
 				t.loading_text = "";
@@ -79,6 +115,8 @@
 		},
 		data() {
 			return {
+				sound: null,
+
 				current_view: 'LIBRARY',
 
 				display_controls: true,
