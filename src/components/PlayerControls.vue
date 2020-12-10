@@ -2,9 +2,9 @@
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
 		<div class="col-md-2 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
 				<span class="d-block">
-					<strong>{{ player.book_name }}</strong>
+					<strong>{{ book_name }}</strong>
 				</span>
-			<span class="d-block">{{ player.chapter_name }}</span>
+			<span class="d-block">{{ chapter_name }}</span>
 		</div>
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
@@ -42,25 +42,110 @@
 		name: "PlayerControls",
 		computed: {
 			getHumanPosition() {
-				let a = ""+Math.floor(this.player.chapter_position/60)
-				let b = ""+this.player.chapter_position%60
+				/*let a = ""+Math.floor(this.current_file_position/60)
+				let b = ""+this.current_file_position%60
 				a = a.length<2 ? "0"+a : a
 				b = b.length<2 ? "0"+b : b
-				return a+":"+b
+				return a+":"+b*/
+				return new Date(this.current_file_position * 1000).toISOString().substr(11, 8)
 			},
 			getHumanDuration() {
-				let a = ""+Math.floor(this.player.chapter_duration/60)
-				let b = ""+this.player.chapter_duration%60
+				/*let a = ""+Math.floor(this.current_file_duration/60)
+				let b = ""+this.current_file_duration%60
 				a = a.length<2 ? "0"+a : a
 				b = b.length<2 ? "0"+b : b
-				return a+":"+b
+				return a+":"+b*/
+				return new Date(this.current_file_duration * 1000).toISOString().substr(11, 8)
 			},
 			getProgressPercentage() {
-				return Math.floor(this.player.chapter_position / this.player.chapter_duration * 100);
+				return this.current_file_position / this.current_file_duration * 100;
 			}
 		},
-		props: {
-			player: Object,
+
+		data() {
+			return {
+				buffering_audio: false,
+				playing: false,
+
+				book_name: "temp placehoder",
+				chapter_name: "pt1",
+				current_file_position: 0,
+				current_file_duration: 0,
+
+				current_volume: 1,
+				current_speed: 1,
+
+				sound_current: null,
+				sound_next: null,
+				file_sound_current: "",
+				file_sound_next: "",
+			}
+		},
+		methods: {
+			start_play_file(file, next_file) {
+				if(this.sound_current!=null) this.sound_current.pause();
+				if(this.sound_next!=null) this.sound_next.pause();
+
+				if(this.file_sound_current === "") {
+					this.sound_current = new Audio("safe-file-protocol://"+encodeURIComponent(file));
+					this.file_sound_current = file
+					if(next_file !== "") {
+						this.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.file_sound_next = next_file
+					}
+				}
+				else if(file === this.file_sound_next) { //Do we already have the next file prepared ?
+					this.sound_current = this.sound_next;
+					this.file_sound_current = this.file_sound_next;
+
+					if(next_file !== "") {
+						this.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.file_sound_next = next_file
+					}
+				} else { //Nope reprepare it
+					this.sound_current = new Audio("safe-file-protocol://"+encodeURIComponent(file));
+					this.file_sound_current = file
+					if(next_file !== "") {
+						this.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.file_sound_next = next_file
+					}
+				}
+
+				this.sound_current.play();
+				this.sound_current.volume = this.current_volume;
+				this.sound_current.playbackRate  = this.current_speed;
+
+				const t = this;
+				t.buffering_audio = true
+				this.sound_current.addEventListener('canplaythrough', (event) => {
+					console.log(event)
+					t.buffering_audio = false
+				});
+				this.sound_current.addEventListener('play', () => {
+					t.playing = true
+				});
+				this.sound_current.addEventListener('pause', () => {
+					t.playing = true
+				});
+				this.sound_current.addEventListener('pause', () => {
+					t.playing = false
+				});
+				this.sound_current.addEventListener('ended', () => {
+					t.playing = false
+				});
+				this.sound_current.addEventListener('timeupdate', () => {
+					t.current_file_position = t.sound_current.currentTime
+				});
+				this.sound_current.addEventListener('durationchange', () => {
+					t.current_file_duration = t.sound_current.duration
+				});
+				this.sound_current.addEventListener('volumechange', () => {
+					t.current_volume = t.sound_current.volume
+				});
+				this.sound_current.addEventListener('ratechange', () => {
+					t.current_speed = t.sound_current.playbackRate
+				});
+			}
 		}
 	}
 </script>

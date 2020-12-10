@@ -115,8 +115,6 @@
 		},
 		data() {
 			return {
-				sound: null,
-
 				current_view: 'LIBRARY',
 
 				display_controls: true,
