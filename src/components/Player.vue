@@ -49,6 +49,8 @@
 					book_name: "HP03: Harry Potter And The Prisoner Of Askaban",
 					chapter_name: "Chapter 09 - Grim defeat",
 
+					playing: false,
+
 					current_file_position: 0,
 					current_file_duration: 0,
 
@@ -81,7 +83,7 @@
 			send_player_status_over_ipc() {
 
 				this.$electron.ipcRenderer.send("player_update", {
-					playing: !this.sound_current.paused,
+					playing: this.player.playing,
 					current_file_position: this.player.current_file_position,
 					current_file_duration: this.player.current_file_duration,
 					current_volume: this.player.current_volume,
@@ -94,6 +96,15 @@
 				switch (arg) {
 					case "playpause":
 						this.player_toggle_pause();
+						break;
+					case "previous":
+						if(this.player.current_file_position > 5) {
+							this.player.sound_current.currentTime = 0;
+							arg = "restart_file";
+						}
+					// Fallthrough is normal here
+					case "next":
+						this.$electron.ipcRenderer.send("player_control_request", arg)
 						break;
 					default:
 						break;

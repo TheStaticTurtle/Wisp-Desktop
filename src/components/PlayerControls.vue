@@ -9,13 +9,13 @@
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
 				<div class="col" style="font-size: 20px;text-align: center;padding: 15px;">
-					<a class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="$emit('playerControl','previous');" class="text-light control-buttons" href="#" style="padding: 20px;">
 						<i class="icon-control-start"></i>
 					</a>
-					<a @click="this.$emit('playerControl','playpause');" class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="$emit('playerControl','playpause');" class="text-light control-buttons" href="#" style="padding: 20px;">
 						<i v-bind:class="{ 'icon-control-pause': player.playing, 'icon-control-play': !player.playing }" class="icon-control-play"></i>
 					</a>
-					<a class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="$emit('playerControl','next');" class="text-light control-buttons" href="#" style="padding: 20px;">
 						<i class="icon-control-end"></i>
 					</a>
 				</div>
