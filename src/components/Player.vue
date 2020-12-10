@@ -192,15 +192,19 @@
 			}
 		},
 		mounted() {
-
 			const t = this
+
 			this.$electron.ipcRenderer.send("force_reload");
 
-			this.$electron.ipcRenderer.on('new_file', (e, data) => {
-				this.change_file(data)
-				console.log("START")
-				this.sound.play()
-				console.log("STARTE")
+			this.$electron.ipcRenderer.on('player_chapter_update', (e, data) => {
+				console.log(data)
+				t.player.image_url = data.book.picture_url
+				t.player.book_name = data.book.name
+				t.player.chapter_name = data.chapter.chapter_name
+				t.player_start_new_file(
+					data.chapter.file_path,
+					data.next_chapter !== null ? data.next_chapter.file_path : "",
+				)
 			})
 
 			/*

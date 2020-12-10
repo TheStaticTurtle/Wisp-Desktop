@@ -7,6 +7,10 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.STRING,
 			unique: true
 		},
+		unique_hash: {
+			type: DataTypes.STRING,
+			unique: true
+		},
 		picture_url: {
 			type: DataTypes.STRING
 		},

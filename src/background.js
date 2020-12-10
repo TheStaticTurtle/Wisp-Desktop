@@ -34,6 +34,7 @@ sequelize.sync({ force: true })
 
 
 require("./controllers/library").controller(db)
+require("./controllers/audio").controller(db)
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }

@@ -33,7 +33,7 @@
 		mounted() {
 			const t = this;
 			this.$electron.ipcRenderer.on('player_chapter_update', (event, new_chapter) => {
-				t.is_playing_this_one = t.chapter.chapter_no === new_chapter.chapter_no
+				t.is_playing_this_one = t.chapter.unique_hash === new_chapter.chapter.unique_hash
 			})
 		},
 		data() {

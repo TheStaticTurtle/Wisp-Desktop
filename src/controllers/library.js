@@ -77,7 +77,9 @@ function resyncLibraries(db, event) {
 
 
 					if(!books.hasOwnProperty(file_data.common.album)) {
+						const unique_book_id = await md5(file_data.common.album)
 						books[file_data.common.album] = {
+							unique_hash: unique_book_id,
 							name: file_data.common.album,
 							picture: null,
 							border_color: "#1f1f1f",
@@ -128,6 +130,8 @@ function resyncLibraries(db, event) {
 				truncate: true
 			});
 
+			for (let i = 0; i < books_organized.length; i++) books_organized[i].id = i
+
 			for (let i = 0; i < books_organized.length; i++) {
 				let b = books_organized[i]
 				b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
@@ -153,11 +157,13 @@ function reloadLibrary(db, event) {
 			// Remap it correctly
 			results = results.map(book => {
 				return {
+					unique_hash: book.unique_hash,
 					name: book.name,
 					picture_url: book.picture_url,
 					border_color: book.border_color,
 					chapters: book.chapters.map(chapter => {
 						return {
+							unique_hash: chapter.unique_hash,
 							file_path: chapter.file_path,
 							chapter_no: chapter.chapter_no,
 							chapter_name: chapter.chapter_name,

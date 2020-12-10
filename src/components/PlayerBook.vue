@@ -7,7 +7,12 @@
 					<div class="col" style="padding-top: 16px;margin-left: 16px;">
 						<h1 class="text-light">{{ book.name }}</h1>
 						<p class="text-muted" style="margin-bottom: 4px;">By: {{ getBookReaders(book) }}</p>
-						<p class="text-muted">{{ book.chapters.length }} Chapters {{ getHumanBookDuration(book) }}</p><button class="btn btn-danger btn-lg" type="button"><i class="icon-control-play" style="margin-right: 16px;"></i>Start listening</button></div>
+						<p class="text-muted">{{ book.chapters.length }} Chapters {{ getHumanBookDuration(book) }}</p>
+						<button @click="start_read_book" class="btn btn-danger btn-lg" type="button">
+							<i class="icon-control-play" style="margin-right: 16px;"></i>
+							Start listening
+						</button>
+					</div>
 				</div>
 				<div class="row no-gutters d-flex flex-row">
 					<div class="col text-light">
@@ -80,6 +85,9 @@
 			book: Object,
 		},
 		methods: {
+			start_read_book() {
+				this.$electron.ipcRenderer.send("player_read_new_book_request", this.book)
+			},
 			getBookReaders() {
 				const arr = this.book.chapters.map(x => x.chapter_artist)
 				const unique = arr.filter(function(elem, pos) { return arr.indexOf(elem) === pos; });
