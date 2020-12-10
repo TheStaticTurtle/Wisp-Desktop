@@ -2,13 +2,23 @@
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
 		<div class="col-md-2 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
 				<span class="d-block">
-					<strong>{{ book_name }}</strong>
+					<strong>{{ player.book_name }}</strong>
 				</span>
-			<span class="d-block">{{ chapter_name }}</span>
+			<span class="d-block">{{ player.chapter_name }}</span>
 		</div>
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
-				<div class="col" style="font-size: 20px;text-align: center;padding: 15px;"><a class="text-light control-buttons" href="#" style="padding: 20px;"><i class="icon-control-start"></i></a><a class="text-light control-buttons" href="#" style="padding: 20px;"><i class="icon-control-play"></i></a><a class="text-light control-buttons" href="#" style="padding: 20px;"><i class="icon-control-end"></i></a></div>
+				<div class="col" style="font-size: 20px;text-align: center;padding: 15px;">
+					<a class="text-light control-buttons" href="#" style="padding: 20px;">
+						<i class="icon-control-start"></i>
+					</a>
+					<a @click="this.$emit('playerControl','playpause');" class="text-light control-buttons" href="#" style="padding: 20px;">
+						<i v-bind:class="{ 'icon-control-pause': player.playing, 'icon-control-play': !player.playing }" class="icon-control-play"></i>
+					</a>
+					<a class="text-light control-buttons" href="#" style="padding: 20px;">
+						<i class="icon-control-end"></i>
+					</a>
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-2 text-right text-white" style="padding: 0px;">
@@ -16,8 +26,8 @@
 				</div>
 				<div class="col-8 text-white d-xl-flex justify-content-xl-center align-items-xl-center">
 					<div class="progress" style="width: 100%;height: 7px;">
-						<div class="progress-bar bg-danger" v-bind:aria-valuenow="getProgressPercentage" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: getProgressPercentage+'%'}">
-							<span class="sr-only">{{getProgressPercentage}}%</span>
+						<div v-bind:class="{ 'progress-bar-striped': player.buffering_audio}" class="progress-bar bg-dange progress-bar-animated" v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: progress+'%'}">
+							<span class="sr-only">{{progress}}%</span>
 						</div>
 					</div>
 				</div>
@@ -47,7 +57,7 @@
 				a = a.length<2 ? "0"+a : a
 				b = b.length<2 ? "0"+b : b
 				return a+":"+b*/
-				return new Date(this.current_file_position * 1000).toISOString().substr(11, 8)
+				return new Date(this.player.current_file_position * 1000).toISOString().substr(11, 8)
 			},
 			getHumanDuration() {
 				/*let a = ""+Math.floor(this.current_file_duration/60)
@@ -55,13 +65,30 @@
 				a = a.length<2 ? "0"+a : a
 				b = b.length<2 ? "0"+b : b
 				return a+":"+b*/
-				return new Date(this.current_file_duration * 1000).toISOString().substr(11, 8)
+				return new Date(this.player.current_file_duration * 1000).toISOString().substr(11, 8)
 			},
 			getProgressPercentage() {
-				return this.current_file_position / this.current_file_duration * 100;
+				return this.player.buffering_audio ? 100 : (this.player.current_file_position / this.player.current_file_duration * 100)
 			}
 		},
+		watch: {
+			player: {
+				handler () {
+					this.progress = this.player.buffering_audio ? 100 : (this.player.current_file_position / this.player.current_file_duration * 100)
+				},
+				deep: true
+			},
+		},
 
+		props: {
+			player: Object
+		},
+		data() {
+			return {
+				progress: 0
+			}
+		}
+		/*
 		data() {
 			return {
 				buffering_audio: false,
@@ -82,6 +109,10 @@
 			}
 		},
 		methods: {
+			toggle_play_pause() {
+				if(this.playing) this.sound_current.pause()
+				else this.sound_current.play()
+			},
 			start_play_file(file, next_file) {
 				if(this.sound_current!=null) this.sound_current.pause();
 				if(this.sound_next!=null) this.sound_next.pause();
@@ -135,6 +166,7 @@
 				});
 				this.sound_current.addEventListener('timeupdate', () => {
 					t.current_file_position = t.sound_current.currentTime
+					t.buffering_audio = false
 				});
 				this.sound_current.addEventListener('durationchange', () => {
 					t.current_file_duration = t.sound_current.duration
@@ -146,7 +178,7 @@
 					t.current_speed = t.sound_current.playbackRate
 				});
 			}
-		}
+		}*/
 	}
 </script>
 

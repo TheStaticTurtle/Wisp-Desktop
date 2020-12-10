@@ -11,7 +11,7 @@
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
-		<PlayerControls v-if="display_controls" :player="player"></PlayerControls>
+		<PlayerControls v-if="display_controls" :player="player" @playerControl="playerControlCB"></PlayerControls>
 	</div>
 </template>
 
@@ -31,6 +31,37 @@
 		/*props: {
           msg: String
         }*/
+		data() {
+			return {
+				current_view: 'LIBRARY',
+
+				display_controls: true,
+
+				is_loading: false,
+				loading_text: "",
+
+				book_view_display_which_book: null,
+
+				books: [],
+
+				player: {
+					image_url: "https://play-lh.googleusercontent.com/_b0GMcmNNohcFugJ-89sG3XAexek1A0EacfTcDoCfTVbz4hKGP6PIQ1Psme66qZBGmeR537rJON2rA",
+					book_name: "HP03: Harry Potter And The Prisoner Of Askaban",
+					chapter_name: "Chapter 09 - Grim defeat",
+
+					current_file_position: 0,
+					current_file_duration: 0,
+
+					current_volume: 1,
+					current_speed: 1,
+
+					sound_current: null,
+					sound_next: null,
+					file_sound_current: "",
+					file_sound_next: "",
+				},
+			}
+		},
 		methods: {
 			libraryBookClick(arg) {
 				this.book_view_display_which_book = this.books[Math.max(Math.min(arg,this.books.length-1),0)];
@@ -46,32 +77,107 @@
 						break;
 				}
 			},
-			change_file(file_path) {
-				if(this.sound!=null) this.sound.pause();
-				this.sound = new Audio("safe-file-protocol://"+file_path);
-				/*this.sound = new Howl({
-					src: ["safe-file-protocol://"+file_path],
-					autoplay: false,
-					loop: false,
-					html5: true,
-					volume: 0.5,
-					onstart: function() {
-						console.log('Started!');
-					},
-					onpause: function() {
-						console.log('Paused!');
-					},
-					onend: function() {
-						console.log('Finished!');
-					},
-					onseek : function(arg) {
-						console.log('Seek: '+arg);
-					}
-				});*/
-				this.sound.addEventListener('canplaythrough', function () {
-					console.log("now")
+
+			send_player_status_over_ipc() {
+
+				this.$electron.ipcRenderer.send("player_update", {
+					playing: !this.sound_current.paused,
+					current_file_position: this.player.current_file_position,
+					current_file_duration: this.player.current_file_duration,
+					current_volume: this.player.current_volume,
+					current_speed: this.player.current_speed,
+					file_sound_current: this.player.file_sound_current,
+					file_sound_next: this.player.file_sound_next,
 				});
-				return this.sound
+			},
+			playerControlCB(arg) {
+				switch (arg) {
+					case "playpause":
+						this.player_toggle_pause();
+						break;
+					default:
+						break;
+				}
+			},
+			player_toggle_pause() {
+				if(this.player.playing) this.player.sound_current.pause();
+				else this.player.sound_current.play();
+				this.send_player_status_over_ipc();
+			},
+			player_start_new_file(file, next_file) {
+				if(this.player.sound_current!=null) this.player.sound_current.pause();
+				if(this.player.sound_next!=null) this.player.sound_next.pause();
+
+				if(this.player.file_sound_current === "") {
+					this.player.sound_current = new Audio("safe-file-protocol://"+encodeURIComponent(file));
+					this.player.file_sound_current = file
+					if(next_file !== "") {
+						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.player.file_sound_next = next_file
+					}
+				}
+				else if(file === this.player.file_sound_next) { //Do we already have the next file prepared ?
+					this.player.sound_current = this.player.sound_next;
+					this.player.file_sound_current = this.player.file_sound_next;
+
+					if(next_file !== "") {
+						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.player.file_sound_next = next_file
+					}
+				} else { //Nope reprepare it
+					this.player.sound_current = new Audio("safe-file-protocol://"+encodeURIComponent(file));
+					this.player.file_sound_current = file
+					if(next_file !== "") {
+						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
+						this.player.file_sound_next = next_file
+					}
+				}
+
+				this.player.sound_current.play();
+				this.player.sound_current.volume = this.player.current_volume;
+				this.player.sound_current.playbackRate  = this.player.current_speed;
+
+				this.send_player_status_over_ipc();
+
+				const t = this;
+				t.player.buffering_audio = true
+				this.player.sound_current.addEventListener('canplaythrough', () => {
+					t.player.buffering_audio = false
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('play', () => {
+					t.player.playing = true
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('pause', () => {
+					t.player.playing = true
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('pause', () => {
+					t.player.playing = false
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('ended', () => {
+					t.player.playing = false
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('timeupdate', () => {
+					t.player.current_file_position = t.player.sound_current.currentTime
+					t.player.buffering_audio = false
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('durationchange', () => {
+					t.player.current_file_duration = t.player.sound_current.duration
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('volumechange', () => {
+					t.player.current_volume = t.player.sound_current.volume
+					this.send_player_status_over_ipc();
+				});
+				this.player.sound_current.addEventListener('ratechange', () => {
+					t.player.current_speed = t.player.sound_current.playbackRate
+					this.send_player_status_over_ipc();
+				});
 			}
 		},
 		mounted() {
@@ -86,16 +192,11 @@
 				console.log("STARTE")
 			})
 
+			/*
+				Event listeners concerning  the library
+			 */
 			this.$electron.ipcRenderer.on('library_load', () => {
 				t.loading_text = "";
-				/*switch (arg) {
-					case "start":
-						t.is_loading = true;
-						break;
-					default:
-						t.is_loading = false
-						break;
-				}*/
 			})
 			this.$electron.ipcRenderer.on('loading', () => {
 				t.is_loading = true;
@@ -103,7 +204,6 @@
 			this.$electron.ipcRenderer.on('end_loading', () => {
 				t.is_loading = false;
 			})
-
 			this.$electron.ipcRenderer.on('library_load_text', (event, arg) => {
 				t.loading_text = arg
 			})
@@ -111,36 +211,7 @@
 				this.current_view = 'LIBRARY'
 				t.books = arg;
 			})
-
 		},
-		data() {
-			return {
-				current_view: 'LIBRARY',
-
-				display_controls: true,
-
-				is_loading: false,
-				loading_text: "",
-
-				book_view_display_which_book: null,
-
-
-				books: [
-					/*{
-						name: "HP01: Harry Potter And The Sorcerer Stone",
-						picture_url: "https://kbimages1-a.akamaihd.net/5c287314-3696-47c6-b70c-50ce17d5a99a/1200/1200/False/harry-potter-and-the-sorcerer-s-stone-3.jpg",
-						id: "aergzqesdfezfrgtyhujkio"
-					}, */
-				],
-				player: {
-					image_url: "https://play-lh.googleusercontent.com/_b0GMcmNNohcFugJ-89sG3XAexek1A0EacfTcDoCfTVbz4hKGP6PIQ1Psme66qZBGmeR537rJON2rA",
-					book_name: "HP03: Harry Potter And The Prisoner Of Askaban",
-					chapter_name: "Chapter 09 - Grim defeat",
-					chapter_position: 8*60+35,
-					chapter_duration: 35*60+1,
-				},
-			}
-		}
 	}
 </script>
 
