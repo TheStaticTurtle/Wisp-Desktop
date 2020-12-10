@@ -3,11 +3,7 @@ import { app, protocol, BrowserWindow, ipcMain  } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
-const AudioPlayer = require("./controllers/AudioPlayer").AudioPlayer
-
 const isDevelopment = process.env.NODE_ENV !== 'production'
-
-const audio = new AudioPlayer();
 
 const fs = require('fs');
 const path = require('path');
@@ -37,7 +33,7 @@ const db = {
 sequelize.sync({ force: true })
 
 
-require("./controllers/player").controller(db,audio)
+require("./controllers/library").controller(db)
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }

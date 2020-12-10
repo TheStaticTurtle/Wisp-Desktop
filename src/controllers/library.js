@@ -4,17 +4,7 @@ const glob = require("glob");
 const fs = require('fs');
 const mm = require('music-metadata');
 const dataurl = require('dataurl');
-
-const convertSong = (filePath) => {
-	return new Promise((resolve, reject) => {
-		fs.readFile(filePath, (err, data) => {
-			if (err) {
-				reject(err);
-			}
-			resolve(dataurl.convert({data, mimetype: 'audio/mp3'}));
-		});
-	});
-};
+const md5 = require('md5');
 
 function globPromise (dir, asObject = false) {
 	return new Promise ((resolve, reject) => {
@@ -48,15 +38,43 @@ function resyncLibraries(db, event) {
 			event.sender.send("library_load", "start");
 
 			let books = {}
+			let ids = []
 
 			for (const result of results) {
 
 				const walk_results = await globPromise(result.path);
 
 				for (let i = 0; i < walk_results.length; i++) {
-					const file_data = await mm.parseFile(walk_results[i])
+					let file_data = null;
+					try{
+						file_data = await mm.parseFile(walk_results[i])
+					} catch (e) {
+						event.sender.send("ui_notify", {
+							type: "error",
+							title:"An unexpected error has occured:",
+							text: "Failed gathering metadata about file: "+walk_results[i],
+							collapse_title: "Stacktrace",
+							collapse: e.stack || e.toString()
+						});
+					}
+					if(file_data===null) continue;
 
 					if(file_data.common.album === null) file_data.common.album = "Unknown book"
+
+					if(
+						!file_data.common.hasOwnProperty("album")  || file_data.common.album === "" || file_data.common.album === null ||
+						!file_data.common.hasOwnProperty("title")  || file_data.common.title === "" || file_data.common.title === null ||
+						!file_data.common.hasOwnProperty("artist") || file_data.common.artist === "" || file_data.common.artist === null ||
+						!file_data.common.track.hasOwnProperty("no")
+					) {
+						event.sender.send("ui_notify", {
+							type: "error",
+							title:"Failed to parse a file:",
+							text: walk_results[i] + " is missing on of those fileds: artist/album/title/track_no",
+						});
+						continue;
+					}
+
 
 					if(!books.hasOwnProperty(file_data.common.album)) {
 						books[file_data.common.album] = {
@@ -67,14 +85,29 @@ function resyncLibraries(db, event) {
 						}
 					}
 
+					const unique_chapter_id = await md5(file_data.common.album+"_"+file_data.common.title)
+					if(ids.includes(unique_chapter_id)) {
+						event.sender.send("ui_notify", {
+							type: "warn",
+							title:"Duplicate found",
+							text: "Found multiple entries for: "+file_data.common.album+" / "+file_data.common.title,
+							collapse_title: "Details:",
+							collapse: "File path:" + walk_results[i]
+						});
+						continue;
+					}
+					ids.push(unique_chapter_id)
+
 					books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
 
 
 					books[file_data.common.album].chapters.push({
+						unique_hash: unique_chapter_id,
 						file_path: walk_results[i],
 						chapter_no: file_data.common.track.no,
 						chapter_name: file_data.common.title,
-						chapter_artist: file_data.common.artist
+						chapter_artist: file_data.common.artist,
+						chapter_duration: file_data.format.duration ? file_data.format.duration : 0
 					})
 
 					event.sender.send("library_load_text", "Parsing file "+i+" out of "+walk_results.length);
@@ -145,7 +178,7 @@ function reloadLibrary(db, event) {
 
 }
 
-function controller(db,audio) {
+function controller(db) {
 	ipcMain.on("force_reload",function (event, arg) {
 		event.sender.send("loading", "loading");
 		reloadLibrary(db, event).then(function () {
