@@ -130,8 +130,6 @@ function resyncLibraries(db, event) {
 				truncate: true
 			});
 
-			for (let i = 0; i < books_organized.length; i++) books_organized[i].id = i
-
 			for (let i = 0; i < books_organized.length; i++) {
 				let b = books_organized[i]
 				b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
