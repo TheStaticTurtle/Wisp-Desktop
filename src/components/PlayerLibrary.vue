@@ -2,7 +2,7 @@
 	<div class="col-md-10 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 		<h1 class="text-light">My library</h1>
 		<hr class="d-flex" style="background: #ffffff;width: 100%;">
-		<div class="row no-gutters d-flex flex-grow-1" style="overflow-y: scroll;height: 1px;margin-bottom: 15px;">
+		<div class="row d-flex flex-grow-1" style="overflow-y: auto;height: 1px;margin-bottom: 15px;">
 
 			<LibraryItem v-for="(book, index) in books" :key="book.id" :name="book.name" :picture_url="book.picture_url" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
 

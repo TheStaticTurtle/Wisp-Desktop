@@ -42,7 +42,7 @@
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="fa fa-volume-up"></i>
 					</a>
-					<input class="custom-range slider" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;">
+					<input class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;">
 				</div>
 			</div>
 			<div v-if="enable_controls" class="row" style="margin-top: 16px;margin-bottom: 16px;">
@@ -50,7 +50,7 @@
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="icon-speedometer"></i>
 					</a>
-					<input class="custom-range slider" type="range" id="myRange-1" min="0" max="100" value="50" style="height: 4px;">
+					<input class="slider slider-thumb-orange" type="range" id="myRange-1" min="0" max="100" value="50" style="height: 4px;">
 				</div>
 			</div>
 		</div>
