@@ -92,6 +92,7 @@
 				return new Date(this.player.current_file_position * 1000).toISOString().substr(11, 8)
 			},
 			getHumanDuration() {
+				//return new Date(this.duration * 1000).toISOString().substr(11, 8)
 				return new Date(this.player.current_file_duration * 1000).toISOString().substr(11, 8)
 			},
 		},
@@ -115,6 +116,8 @@
 			player: {
 				handler () {
 					this.progress = this.is_draging ? this.progress : this.player.current_file_position
+					/*this.duration = this.player.current_file_duration
+					console.log(this.player.current_file_duration)*/
 				},
 				deep: true
 			},
@@ -133,6 +136,7 @@
 
 				drag_progress: 50,
 				progress: 0,
+				//duration: 0,
 
 				range_speed_control: 100,
 				range_volume_control: 85,

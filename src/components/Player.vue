@@ -28,9 +28,6 @@
 	import Loading from "./Loading";
 	import PlayerBook from "./PlayerBook";
 
-	//const Audio = require("./../controllers/AudioPlayer")
-	//const {Howl} = require('howler');
-
 	export default {
 		name: 'Player',
 		components: {PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
@@ -205,6 +202,7 @@
 				});
 				this.player.sound_current.addEventListener('timeupdate', () => {
 					t.player.current_file_position = t.player.sound_current.currentTime
+					t.player.current_file_duration = t.player.sound_current.duration
 					t.player.buffering_audio = false
 					this.send_player_status_over_ipc();
 				});
