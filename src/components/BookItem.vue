@@ -2,16 +2,16 @@
 	<tr class="custom_tr_body" @mouseover="is_hover = true" @mouseleave="is_hover = false">
 
 		<td v-if="!is_hover && ( !playing || !is_playing_this_one )" class="text-center">{{ chapter.chapter_no }}</td>
-		<td v-if="!is_hover && is_playing_this_one && playing" class="text-center" style="padding-top: 14px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
+		<td v-if="!is_hover && is_playing_this_one && playing" class="text-center" style="padding-top: 14px;padding-bottom: 0px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
 
-		<td v-if="is_hover && ( !playing || !is_playing_this_one )" class="text-center" style="padding: 8px;">
+		<td v-if="is_hover && ( !playing || !is_playing_this_one )" class="text-center" style="padding: 8px; padding-top: 13px;padding-bottom: 0px;">
 			<button @click="$emit('chapterPlayPause', {action:'play', what:chapter})" class="btn btn-success float-none d-flex mx-auto justify-content-center align-items-center" type="button" style="padding: 2px 4px;">
 				<i class="icon-control-play" style="font-size: 15px;"></i>
 			</button>
 		</td>
-		<td v-if="is_hover && is_playing_this_one && playing" class="text-center" style="padding: 8px;">
+		<td v-if="is_hover && is_playing_this_one && playing" class="text-center" style="padding: 8px; padding-top: 14px; padding-bottom: 0px;">
 			<button @click="$emit('chapterPlayPause', {action:'pause'})" class="btn btn-secondary float-none d-flex mx-auto justify-content-center align-items-center" type="button" style="padding: 2px 4px;">
-				<i class="icon-control-pause" style="font-size: 15px;"></i>
+				<i class="icon-control-pause" style="font-size: 17px;"></i>
 			</button>
 		</td>
 
