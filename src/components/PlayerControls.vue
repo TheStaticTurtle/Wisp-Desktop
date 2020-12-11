@@ -26,7 +26,7 @@
 				</div>
 				<div class="col-8 text-white d-xl-flex justify-content-xl-center align-items-xl-center">
 					<div class="progress" style="width: 100%;height: 7px;">
-						<div v-bind:class="{ 'progress-bar-striped': player.buffering_audio, 'bg-danger': player.playing, 'bg-warning': player.buffering_audio}" class="progress-bar progress-bar-animated" v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: progress+'%'}">
+						<div v-bind:class="{ 'progress-bar-striped': player.buffering_audio, 'bg-danger': player.playing, 'bg-warning': player.buffering_audio || !player.playing}" class="progress-bar progress-bar-animated" v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: progress+'%'}">
 							<span class="sr-only">{{progress}}%</span>
 						</div>
 					</div>

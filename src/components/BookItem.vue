@@ -4,8 +4,16 @@
 		<td v-if="!is_hover && !is_playing_this_one" class="text-center">{{ chapter.chapter_no }}</td>
 		<td v-if="!is_hover && is_playing_this_one" class="text-center" style="padding-top: 14px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
 
-		<td v-if="is_hover && !is_playing_this_one" class="text-center" style="padding: 8px;"><button class="btn btn-success float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;"><i class="icon-control-play" style="font-size: 15px;"></i></button></td>
-		<td v-if="is_hover && is_playing_this_one" class="text-center" style="padding: 8px;"><button class="btn btn-secondary float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;"><i class="icon-control-pause" style="font-size: 15px;"></i></button></td>
+		<td v-if="is_hover && !is_playing_this_one" class="text-center" style="padding: 8px;">
+			<button @click="$emit('chapterPlayPause', {action:'play', what:chapter})" class="btn btn-success float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;">
+				<i class="icon-control-play" style="font-size: 15px;"></i>
+			</button>
+		</td>
+		<td v-if="is_hover && is_playing_this_one" class="text-center" style="padding: 8px;">
+			<button @click="$emit('chapterPlayPause', {action:'pause'})" class="btn btn-secondary float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;">
+				<i class="icon-control-pause" style="font-size: 15px;"></i>
+			</button>
+		</td>
 
 		<td>{{ chapter.chapter_name }}</td>
 		<td class="text-center">{{ getHumanDuration() }}</td>

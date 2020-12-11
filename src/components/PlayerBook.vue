@@ -20,38 +20,16 @@
 						<div class="table-responsive text-light">
 							<table class="table table-hover">
 								<thead class="text-light">
-								<tr class="custom_tr_head">
-									<th class="text-nowrap text-center" style="width: 1%;">#</th>
-									<th>Title</th>
-									<th class="text-nowrap text-center" style="width: 1%;"><i class="icon-clock"></i></th>
-								</tr>
+									<tr class="custom_tr_head">
+										<th class="text-nowrap text-center" style="width: 1%;">#</th>
+										<th>Title</th>
+										<th class="text-nowrap text-center" style="width: 1%;"><i class="icon-clock"></i></th>
+									</tr>
 								</thead>
 								<tbody class="text-light">
 
-								<BookItem v-for="(chapter, index) in book.chapters" :key="book.id+'_'+index" :chapter="chapter" ></BookItem>
+									<BookItem v-for="(chapter, index) in book.chapters" :key="book.id+'_'+index" :chapter="chapter" @chapterPlayPause="(data) => {$emit('chapterPlayPause',data)}" ></BookItem>
 
-								<!--
-								<tr class="custom_tr_body">
-									<td class="text-center">222</td>
-									<td>Chapter 02 - The scar</td>
-									<td class="text-center">18:41</td>
-								</tr>
-								<tr class="custom_tr_body">
-									<td class="text-center" style="padding: 8px;"><button class="btn btn-success float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 5px;"><i class="icon-control-play" style="font-size: 18px;"></i></button></td>
-									<td>Chapter 02 - The scar</td>
-									<td class="text-center">18:41</td>
-								</tr>
-								<tr class="custom_tr_body">
-									<td class="text-center" style="padding: 8px;"><button class="btn btn-secondary float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 5px;"><i class="icon-control-pause" style="font-size: 18px;"></i></button></td>
-									<td>Chapter 02 - The scar</td>
-									<td class="text-center">18:41</td>
-								</tr>
-								<tr class="custom_tr_body">
-									<td class="text-center" style="padding-top: 14px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
-									<td>Chapter 02 - The scar</td>
-									<td class="text-center">18:41</td>
-								</tr>
-								-->
 								</tbody>
 							</table>
 						</div>

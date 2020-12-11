@@ -4,7 +4,7 @@
 			<template  v-if="!is_loading">
 				<PlayerNavigation :display_player_related="display_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 				<PlayerLibrary v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
-				<PlayerBook v-if="current_view === 'BOOK'" :book="book_view_display_which_book"></PlayerBook>
+				<PlayerBook v-if="current_view === 'BOOK'" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 			</template >
 
 			<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
@@ -48,6 +48,7 @@
 					image_url: "https://play-lh.googleusercontent.com/_b0GMcmNNohcFugJ-89sG3XAexek1A0EacfTcDoCfTVbz4hKGP6PIQ1Psme66qZBGmeR537rJON2rA",
 					book_name: "HP03: Harry Potter And The Prisoner Of Askaban",
 					chapter_name: "Chapter 09 - Grim defeat",
+					chapter_uh: "",
 
 					playing: false,
 
@@ -78,6 +79,13 @@
 						console.log(arg)
 						break;
 				}
+			},
+			chapterPlayPauseCtls(arg) {
+				if(arg.action === "pause" || arg.what.unique_hash === this.player.chapter_uh) this.player_toggle_pause()
+				else {
+					this.$electron.ipcRenderer.send("player_read_new_chapter_request", arg.what)
+				}
+				console.log(arg)
 			},
 
 			send_player_status_over_ipc() {
@@ -201,6 +209,7 @@
 				t.player.image_url = data.book.picture_url
 				t.player.book_name = data.book.name
 				t.player.chapter_name = data.chapter.chapter_name
+				t.player.chapter_uh = data.chapter.unique_hash
 				t.player_start_new_file(
 					data.chapter.file_path,
 					data.next_chapter !== null ? data.next_chapter.file_path : "",
