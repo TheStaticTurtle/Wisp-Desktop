@@ -46,6 +46,10 @@ function resyncLibraries(db, event) {
 
 				for (let i = 0; i < walk_results.length; i++) {
 					let file_data = null;
+					const ext = path.extname(walk_results[i])
+
+					if(!["wav","mp3","ogg","webm","flac","aac"].includes(ext)) continue;
+
 					try{
 						file_data = await mm.parseFile(walk_results[i])
 					} catch (e) {

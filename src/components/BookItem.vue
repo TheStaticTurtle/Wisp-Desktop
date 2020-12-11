@@ -1,5 +1,10 @@
 <template>
-	<tr class="custom_tr_body" @mouseover="is_hover = true" @mouseleave="is_hover = false" @dblclick="$emit('chapterPlayPause', {action:'play', what:chapter})">
+	<tr
+			class="custom_tr_body"
+			@mouseover="is_hover = true"
+			@mouseleave="is_hover = false"
+			@dblclick="$emit('chapterPlayPause', {action:'play', what:chapter})"
+	>
 
 		<td v-if="!is_hover && ( !playing || !is_playing_this_one )" class="text-center">{{ chapter.chapter_no }}</td>
 		<td v-if="!is_hover && is_playing_this_one && playing" class="text-center" style="padding-top: 14px;padding-bottom: 0px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
@@ -15,7 +20,7 @@
 			</button>
 		</td>
 
-		<td>{{ chapter.chapter_name }}</td>
+		<td v-bind:class="{'text-danger':is_playing_this_one}"  >{{ chapter.chapter_name }}</td>
 		<td class="text-center">{{ getHumanDuration() }}</td>
 	</tr>
 </template>
