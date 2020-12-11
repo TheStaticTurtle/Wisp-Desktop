@@ -2,7 +2,7 @@
 	<div class="container-fluid d-flex flex-column" style="height: 100%;">
 		<div class="row flex-grow-1">
 			<template  v-if="!is_loading">
-				<PlayerNavigation :display_player_related="display_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
+				<PlayerNavigation :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 				<PlayerLibrary v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
 				<PlayerBook v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 			</template >
@@ -11,7 +11,7 @@
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
-		<PlayerControls v-if="display_controls" :player="player" @playerControl="playerControlCB"></PlayerControls>
+		<PlayerControls :enable_controls="enable_controls" :player="player" @playerControl="playerControlCB"></PlayerControls>
 	</div>
 </template>
 
@@ -35,7 +35,7 @@
 			return {
 				current_view: 'LIBRARY',
 
-				display_controls: true,
+				enable_controls: false,
 
 				is_loading: false,
 				loading_text: "",
@@ -45,9 +45,9 @@
 				books: [],
 
 				player: {
-					image_url: "https://play-lh.googleusercontent.com/_b0GMcmNNohcFugJ-89sG3XAexek1A0EacfTcDoCfTVbz4hKGP6PIQ1Psme66qZBGmeR537rJON2rA",
-					book_name: "HP03: Harry Potter And The Prisoner Of Askaban",
-					chapter_name: "Chapter 09 - Grim defeat",
+					image_url: "",
+					book_name: "",
+					chapter_name: "",
 					chapter_uh: "",
 
 					playing: false,
@@ -64,6 +64,14 @@
 					file_sound_next: "",
 				},
 			}
+		},
+		watch: {
+			player: {
+				handler () {
+					this.enable_controls = this.player.playing || this.player.sound_current != null
+				},
+				deep: true
+			},
 		},
 		methods: {
 			libraryBookClick(arg) {

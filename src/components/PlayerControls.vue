@@ -1,43 +1,43 @@
 <template>
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
 		<div class="col-md-2 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
-				<span class="d-block">
-					<strong>{{ player.book_name }}</strong>
-				</span>
+			<span class="d-block">
+				<strong>{{ player.book_name }}</strong>
+			</span>
 			<span class="d-block">{{ player.chapter_name }}</span>
 		</div>
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
 				<div class="col" style="font-size: 20px;text-align: center;padding: 15px;">
-					<a @click="$emit('playerControl','previous');" class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','previous');}" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons " href="#" style="padding: 20px;">
 						<i class="icon-control-start"></i>
 					</a>
-					<a @click="$emit('playerControl','playpause');" class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','playpause'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons" href="#" style="padding: 20px;">
 						<i v-bind:class="{ 'icon-control-pause': player.playing, 'icon-control-play': !player.playing }" class="icon-control-play"></i>
 					</a>
-					<a @click="$emit('playerControl','next');" class="text-light control-buttons" href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','next'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons" href="#" style="padding: 20px;">
 						<i class="icon-control-end"></i>
 					</a>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-2 text-right text-white" style="padding: 0px;">
-					<span>{{ getHumanPosition }}</span>
+					<span v-bind:class="{'disabled-link':!enable_controls}" >{{ getHumanPosition }}</span>
 				</div>
 				<div class="col-8 text-white d-flex justify-content-center align-items-center">
-					<div class="progress" style="width: 100%;height: 7px;">
+					<div class="progress" v-bind:class="{'disabled-progress':!enable_controls}"  style="width: 100%;height: 7px;">
 						<div v-bind:class="{ 'progress-bar-striped': player.buffering_audio, 'bg-danger': player.playing, 'bg-warning': player.buffering_audio || !player.playing}" class="progress-bar progress-bar-animated" v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: progress+'%'}">
 							<span class="sr-only">{{progress}}%</span>
 						</div>
 					</div>
 				</div>
 				<div class="col-2 text-white" style="padding: 0px;">
-					<span>{{ getHumanDuration }}</span>
+					<span v-bind:class="{'disabled-link':!enable_controls}" >{{ getHumanDuration }}</span>
 				</div>
 			</div>
 		</div>
 		<div class="col-md-2 col-lg-2 col-xl-2 d-flex flex-column justify-content-center">
-			<div class="row" style="margin-top: 16px;margin-bottom: 16px;">
+			<div v-if="enable_controls" class="row" style="margin-top: 16px;margin-bottom: 16px;">
 				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="fa fa-volume-up"></i>
@@ -45,7 +45,7 @@
 					<input class="custom-range slider" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;">
 				</div>
 			</div>
-			<div class="row" style="margin-top: 16px;margin-bottom: 16px;">
+			<div v-if="enable_controls" class="row" style="margin-top: 16px;margin-bottom: 16px;">
 				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="icon-speedometer"></i>
@@ -88,7 +88,8 @@
 		},
 
 		props: {
-			player: Object
+			player: Object,
+			enable_controls: Boolean
 		},
 		data() {
 			return {

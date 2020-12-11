@@ -34,7 +34,7 @@
   color: white;
 }
 
-.white-hover:hove {
+.white-hover:hover {
   color: white;
 }
 
@@ -42,3 +42,15 @@
   color: white !important;
 }
 
+.disabled-progress {
+  background-color: #8a969e !important;
+  cursor: default;
+}
+.disabled-link {
+  color: #6c757d !important;
+  cursor: default;
+}
+.disabled-link:hover {
+  color: #6c757d !important;
+  text-decoration: none;
+}
