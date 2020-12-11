@@ -1,7 +1,7 @@
 <template>
-	<!-- <div class="container justify-content-end" style="position: absolute;right: 0;top: 0; z-index:10000;margin: 6px;margin-top: 12px;">
+	<!--<div class="container justify-content-end" style="position: absolute;right: 0;top: 0; z-index:10000;margin: 6px;margin-top: 12px;">
 		<div class="row d-flex justify-content-end">-->
-			<div class="col-4">
+			<div class="col-4" style="position: absolute;right: 0;top: 0; z-index:10000;padding: 6px;padding-top: 12px; overflow-y: auto; max-height: 100vh">
 				<!-- <div class="alert alert-info" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button><span><strong>Alert</strong> text.</span></div> -->
 
 
