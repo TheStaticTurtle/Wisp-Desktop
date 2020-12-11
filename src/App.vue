@@ -11,10 +11,9 @@
 		<Notifications></Notifications>
 	</div>
 
-
 	<!--
 		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-		<script src="assets/js/jquery.min.js"></script>
+		<script src="../assets/js/jquery.min.js"></script>
 		<script src="assets/bootstrap/js/bootstrap.min.js"></script>
 		<script>if (window.module) module = window.module;</script>
 	-->
@@ -30,11 +29,14 @@
 
 
 <script>
-	//import HelloWorld from './components/HelloWorld.vue'
 	import Player from './components/Player.vue'
 	import Notifications from "./components/Notifications";
-
+	window.jQuery = window.$ = require('jquery');
 	/*if (process.env.NODE_ENV !== 'development') */window.__static = require('path').join(__dirname, '/assets').replace(/\\/g, '\\\\')
+
+	window.$(function () {
+		window.$('[data-toggle="popover"]').popover()
+	})
 
 	export default {
 		name: 'WhisperBook',

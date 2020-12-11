@@ -37,20 +37,27 @@
 			</div>
 		</div>
 		<div class="col-md-2 col-lg-2 col-xl-2 d-flex flex-column justify-content-center">
-			<div v-if="enable_controls" class="row" style="margin-top: 16px;margin-bottom: 16px;">
+			<div v-if="enable_controls" class="row d-flex justify-content-center" style="text-align: center; margin-top: 4px;">
+				<span class="text-muted">Volume: {{range_volume_control}}%</span>
+			</div>
+			<div v-if="enable_controls" class="row" style="margin-bottom: 16px;">
 				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="fa fa-volume-up"></i>
 					</a>
-					<input class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;">
+					<input v-model="range_volume_control" class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100"  style="height: 4px;">
 				</div>
 			</div>
-			<div v-if="enable_controls" class="row" style="margin-top: 16px;margin-bottom: 16px;">
+
+			<div v-if="enable_controls" class="row d-flex justify-content-center" style="text-align: center; margin-top: 4px;">
+				<span class="text-muted">Speed: {{range_speed_control}}%</span>
+			</div>
+			<div v-if="enable_controls" class="row" style="margin-bottom: 16px;">
 				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="icon-speedometer"></i>
 					</a>
-					<input class="slider slider-thumb-orange" type="range" id="myRange-1" min="0" max="100" value="50" style="height: 4px;">
+					<input v-model="range_speed_control" class="slider slider-thumb-orange" type="range" min="25" max="250" step="15" style="height: 4px;" >
 				</div>
 			</div>
 		</div>
@@ -78,7 +85,23 @@
 				return new Date(this.player.current_file_duration * 1000).toISOString().substr(11, 8)
 			},
 		},
+		methods: {
+			emitValues: function () {
+				this.$emit("VSUpdate", {
+					speed: this.processed_speed,
+					volume: this.processed_volume
+				})
+			}
+		},
 		watch: {
+			range_speed_control(chg) {
+				this.processed_speed = chg / 100.0;
+				this.emitValues();
+			},
+			range_volume_control(chg) {
+				this.processed_volume = chg / 100.0;
+				this.emitValues();
+			},
 			player: {
 				handler () {
 					this.progress = this.player.buffering_audio ? 100 : (this.player.current_file_position / this.player.current_file_duration * 100)
@@ -93,7 +116,11 @@
 		},
 		data() {
 			return {
-				progress: 0
+				progress: 0,
+				range_speed_control: 100,
+				range_volume_control: 85,
+				processed_speed: 1,
+				processed_volume: 1,
 			}
 		}
 		/*
