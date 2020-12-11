@@ -1,8 +1,6 @@
 const { ipcMain } = require('electron')
 const md5 = require('md5');
 
-let current_book = null
-let current_chapter_index = 0
 
 function findIndex(arr, cond) {
 	let i, x;
@@ -13,16 +11,20 @@ function findIndex(arr, cond) {
 }
 
 function controller(db) {
-	const t = this;
+	const t = {
+		current_book: null,
+		current_chapter_index: 0,
+	};
 
 	ipcMain.on("player_read_new_book_request",function (event, arg) {
-		current_book = arg
-		if(current_book.chapters.length===0) return;
+		t.current_book = arg
+		t.current_chapter_index = 0
+		if(t.current_book.chapters.length===0) return;
 
 		event.sender.send("player_chapter_update", {
-			book: current_book,
-			chapter: current_book.chapters[current_chapter_index] !== undefined ? current_book.chapters[current_chapter_index] : null,
-			next_chapter: current_book.chapters[current_chapter_index+1] !== undefined ? current_book.chapters[current_chapter_index+1] : null,
+			book: t.current_book,
+			chapter: t.current_book.chapters[t.current_chapter_index] !== undefined ? t.current_book.chapters[t.current_chapter_index] : null,
+			next_chapter: t.current_book.chapters[t.current_chapter_index+1] !== undefined ? t.current_book.chapters[t.current_chapter_index+1] : null,
 		})
 	});
 
@@ -57,6 +59,8 @@ function controller(db) {
 					}),
 				}
 
+				safe_book.chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
+
 				t.current_book = safe_book
 				t.current_chapter_index = findIndex(t.current_book.chapters, (x) => {
 					return x.unique_hash === arg.unique_hash
@@ -73,24 +77,24 @@ function controller(db) {
 	});
 
 	ipcMain.on("player_control_request",function (event, arg) {
-		if(current_book.chapters.length===0) return;
+		if(t.current_book === null || t.current_book.chapters.length===0) return;
 
 		switch (arg) {
 			case "next":
-				current_chapter_index += 2;
+				t.current_chapter_index += 2;
 			// Fallthrough is normal here bit hacky
 			case "previous":
-				current_chapter_index -= 1;
+				t.current_chapter_index -= 1;
 
-				current_chapter_index = Math.min(Math.max(current_chapter_index,0),current_book.chapters.length-1)
+				t.current_chapter_index = Math.min(Math.max(t.current_chapter_index,0),t.current_book.chapters.length-1)
 				event.sender.send("player_chapter_update", {
-					book: current_book,
-					chapter: current_book.chapters[current_chapter_index] !== undefined ? current_book.chapters[current_chapter_index] : null,
-					next_chapter: current_book.chapters[current_chapter_index+1] !== undefined ? current_book.chapters[current_chapter_index+1] : null,
+					book: t.current_book,
+					chapter: t.current_book.chapters[t.current_chapter_index] !== undefined ? t.current_book.chapters[t.current_chapter_index] : null,
+					next_chapter: t.current_book.chapters[t.current_chapter_index+1] !== undefined ? t.current_book.chapters[t.current_chapter_index+1] : null,
 				})
 				break;
 			default:
-				console.log("[ipc] player_control_request: uknown command: "+arg)
+				console.log("[ipc] player_control_request: unknown command: "+arg)
 				break;
 		}
 

@@ -166,15 +166,17 @@ function reloadLibrary(db, event) {
 							chapter_no: chapter.chapter_no,
 							chapter_name: chapter.chapter_name,
 							chapter_artist: chapter.chapter_artist,
+							chapter_duration: chapter.chapter_duration,
 						}
 					}),
 				}
 			});
 
+			for (let i = 0; i < results.length; i++) results[i].chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
+
 			event.sender.send("library_load", "stop");
 			event.sender.send("library_update", results);
 			resolve(results);
-
 
 		}).catch(reject);
 
