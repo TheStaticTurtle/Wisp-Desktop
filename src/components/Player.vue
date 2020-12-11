@@ -11,7 +11,13 @@
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
-		<PlayerControls :enable_controls="enable_controls" :player="player" @playerControl="playerControlCB" @VSUpdate="playerVSUpdate"></PlayerControls>
+		<PlayerControls
+				:enable_controls="enable_controls"
+				:player="player"
+				@playerControl="playerControlCB"
+				@VSUpdate="playerVSUpdate"
+				@PositionUpdate="playerPositionUpdate"
+		></PlayerControls>
 	</div>
 </template>
 
@@ -109,6 +115,9 @@
 					file_sound_next: this.player.file_sound_next,
 				});
 			},
+			playerPositionUpdate(arg) {
+				this.player.sound_current.currentTime = arg
+			},
 			playerVSUpdate(arg) {
 				this.player.sound_current.playbackRate = arg.speed;
 				this.player.sound_current.volume = arg.volume;
@@ -131,6 +140,7 @@
 						break;
 				}
 			},
+
 			player_toggle_pause() {
 				if(this.player.playing) this.player.sound_current.pause();
 				else this.player.sound_current.play();

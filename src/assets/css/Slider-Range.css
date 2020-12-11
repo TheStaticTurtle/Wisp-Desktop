@@ -45,3 +45,37 @@
 }
 
 
+.slider-progress {
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0);
+  outline: none;
+  opacity: 1;
+}
+
+.slider-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: #fff;
+}
+.slider-thumb-red-dark::-webkit-slider-thumb {
+  background: #7d1b1b;
+}
+.slider-thumb-orange-dark::-webkit-slider-thumb {
+  background: #a06f14;
+}
+
+.progress-bar {
+  -webkit-transition: initial !important;
+  -o-transition: initial !important;
+  transition: initial !important;
+}
+
+.progress-bar.active, .progress.active .progress-bar {
+  -webkit-animation: initial !important;
+  -o-animation: initial !important;
+  animation: initial !important;
+}
