@@ -1,16 +1,16 @@
 <template>
 	<tr class="custom_tr_body" @mouseover="is_hover = true" @mouseleave="is_hover = false">
 
-		<td v-if="!is_hover && !is_playing_this_one" class="text-center">{{ chapter.chapter_no }}</td>
-		<td v-if="!is_hover && is_playing_this_one" class="text-center" style="padding-top: 14px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
+		<td v-if="!is_hover && ( !playing || !is_playing_this_one )" class="text-center">{{ chapter.chapter_no }}</td>
+		<td v-if="!is_hover && is_playing_this_one && playing" class="text-center" style="padding-top: 14px;"><i class="icon-volume-2" style="font-size: 19px;"></i></td>
 
-		<td v-if="is_hover && !is_playing_this_one" class="text-center" style="padding: 8px;">
-			<button @click="$emit('chapterPlayPause', {action:'play', what:chapter})" class="btn btn-success float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;">
+		<td v-if="is_hover && ( !playing || !is_playing_this_one )" class="text-center" style="padding: 8px;">
+			<button @click="$emit('chapterPlayPause', {action:'play', what:chapter})" class="btn btn-success float-none d-flex mx-auto justify-content-center align-items-center" type="button" style="padding: 2px 4px;">
 				<i class="icon-control-play" style="font-size: 15px;"></i>
 			</button>
 		</td>
-		<td v-if="is_hover && is_playing_this_one" class="text-center" style="padding: 8px;">
-			<button @click="$emit('chapterPlayPause', {action:'pause'})" class="btn btn-secondary float-none d-xl-flex mx-auto justify-content-xl-center align-items-xl-center" type="button" style="padding: 2px 4px;">
+		<td v-if="is_hover && is_playing_this_one && playing" class="text-center" style="padding: 8px;">
+			<button @click="$emit('chapterPlayPause', {action:'pause'})" class="btn btn-secondary float-none d-flex mx-auto justify-content-center align-items-center" type="button" style="padding: 2px 4px;">
 				<i class="icon-control-pause" style="font-size: 15px;"></i>
 			</button>
 		</td>
@@ -25,7 +25,14 @@
 		name: "BookItem",
 		props: {
 			chapter: Object,
-			is_playing_this_one: Boolean,
+			player_data: Object
+		},
+		data() {
+			return {
+				is_hover: false,
+				is_playing_this_one: false,
+				playing: false,
+			}
 		},
 		methods: {
 			getHumanDuration() {
@@ -38,17 +45,24 @@
 				this.$electron.ipcRenderer.send("player_pause")
 			}
 		},
-		mounted() {
+		watch: {
+			player_data: {
+				handler () {
+					this.is_playing_this_one = this.chapter.unique_hash === this.player_data.chapter_uh
+					this.playing = this.player_data.playing
+				},
+				deep: true
+			},
+		},
+		/*mounted() {
 			const t = this;
 			this.$electron.ipcRenderer.on('player_chapter_update', (event, new_chapter) => {
 				t.is_playing_this_one = t.chapter.unique_hash === new_chapter.chapter.unique_hash
+				t.is_playing_this_one = t.chapter.unique_hash === this.player_data.chapter_uh
 			})
-		},
-		data() {
-			return {
-				is_hover: false,
-			}
-		}
+			this.$electron.ipcRenderer.on('player_update', (event, data) => {
+			})
+		},*/
 	}
 </script>
 

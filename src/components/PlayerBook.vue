@@ -28,7 +28,7 @@
 								</thead>
 								<tbody class="text-light">
 
-									<BookItem v-for="(chapter, index) in book.chapters" :key="book.id+'_'+index" :chapter="chapter" @chapterPlayPause="(data) => {$emit('chapterPlayPause',data)}" ></BookItem>
+									<BookItem v-for="(chapter, index) in book.chapters" :key="book.id+'_'+index" :player_data="player_data" :chapter="chapter" @chapterPlayPause="(data) => {$emit('chapterPlayPause',data)}" ></BookItem>
 
 								</tbody>
 							</table>
@@ -61,6 +61,7 @@
 		components: { BookItem },
 		props: {
 			book: Object,
+			player_data: Object,
 		},
 		methods: {
 			start_read_book() {

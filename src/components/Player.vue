@@ -4,7 +4,7 @@
 			<template  v-if="!is_loading">
 				<PlayerNavigation :display_player_related="display_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 				<PlayerLibrary v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
-				<PlayerBook v-if="current_view === 'BOOK'" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
+				<PlayerBook v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 			</template >
 
 			<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
@@ -92,6 +92,7 @@
 
 				this.$electron.ipcRenderer.send("player_update", {
 					playing: this.player.playing,
+					chapter_uh: this.player.chapter_uh,
 					current_file_position: this.player.current_file_position,
 					current_file_duration: this.player.current_file_duration,
 					current_volume: this.player.current_volume,

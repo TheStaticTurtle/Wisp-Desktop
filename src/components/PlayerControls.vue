@@ -24,7 +24,7 @@
 				<div class="col-2 text-right text-white" style="padding: 0px;">
 					<span>{{ getHumanPosition }}</span>
 				</div>
-				<div class="col-8 text-white d-xl-flex justify-content-xl-center align-items-xl-center">
+				<div class="col-8 text-white d-flex justify-content-center align-items-center">
 					<div class="progress" style="width: 100%;height: 7px;">
 						<div v-bind:class="{ 'progress-bar-striped': player.buffering_audio, 'bg-danger': player.playing, 'bg-warning': player.buffering_audio || !player.playing}" class="progress-bar progress-bar-animated" v-bind:aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100" v-bind:style="{width: progress+'%'}">
 							<span class="sr-only">{{progress}}%</span>
@@ -38,10 +38,20 @@
 		</div>
 		<div class="col-md-2 col-lg-2 col-xl-2 d-flex flex-column justify-content-center">
 			<div class="row" style="margin-top: 16px;margin-bottom: 16px;">
-				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;"><a class="text-light" href="#" style="padding-right: 20px;"><i class="fa fa-volume-up"></i></a><input class="custom-range slider" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;"></div>
+				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
+					<a class="text-light" href="#" style="padding-right: 20px;">
+						<i class="fa fa-volume-up"></i>
+					</a>
+					<input class="custom-range slider" type="range" id="myRange" min="0" max="100" value="50" style="height: 4px;">
+				</div>
 			</div>
 			<div class="row" style="margin-top: 16px;margin-bottom: 16px;">
-				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;"><a class="text-light" href="#" style="padding-right: 20px;"><i class="icon-speedometer"></i></a><input class="custom-range slider" type="range" id="myRange-1" min="0" max="100" value="50" style="height: 4px;"></div>
+				<div class="col d-flex justify-content-center align-items-center" style="font-size: 20px;text-align: center;margin-bottom: -16px;">
+					<a class="text-light" href="#" style="padding-right: 20px;">
+						<i class="icon-speedometer"></i>
+					</a>
+					<input class="custom-range slider" type="range" id="myRange-1" min="0" max="100" value="50" style="height: 4px;">
+				</div>
 			</div>
 		</div>
 	</div>
@@ -67,9 +77,6 @@
 				return a+":"+b*/
 				return new Date(this.player.current_file_duration * 1000).toISOString().substr(11, 8)
 			},
-			getProgressPercentage() {
-				return this.player.buffering_audio ? 100 : (this.player.current_file_position / this.player.current_file_duration * 100)
-			}
 		},
 		watch: {
 			player: {
