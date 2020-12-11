@@ -34,11 +34,11 @@ function globPromise (dir, asObject = false) {
 
 function resyncLibraries(db, event) {
 	return new Promise(function(resolve, reject) {
+		let ids = []
 		db.models.Library.findAll().then(async (results)=> {
 			event.sender.send("library_load", "start");
 
 			let books = {}
-			let ids = []
 
 			for (const result of results) {
 
