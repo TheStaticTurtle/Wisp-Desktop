@@ -50,6 +50,7 @@ async function createWindow() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: true, //process.env.ELECTRON_NODE_INTEGRATION
       webSecurity: false, //Allow file loading via file://
+      enableRemoteModule: true
     }
   })
 
@@ -86,9 +87,23 @@ app.on('ready', async () => {
     }
   }
 
-  const protocolName = 'safe-file-protocol'
+  const protocolNameFS = 'safe-file-protocol'
+  protocol.registerFileProtocol(protocolNameFS, (request, callback) => {
+    const url = request.url.replace(`${protocolNameFS}://`, '')
+    try {
+      return callback(decodeURIComponent(url))
+    }
+    catch (error) {
+      // Handle the error as needed
+      console.error(error)
+    }
+  });
+
+  const protocolName = 'assets'
   protocol.registerFileProtocol(protocolName, (request, callback) => {
-    const url = request.url.replace(`${protocolName}://`, '')
+    console.log(request.url)
+    const url = path.join(__dirname, request.url.replace(`${protocolName}://`, '../src/assets/'));
+    console.log(url)
     try {
       return callback(decodeURIComponent(url))
     }

@@ -26,6 +26,7 @@
 </template>
 
 <script>
+
 	export default {
 		name: "PlayerNavigation",
 		methods: {

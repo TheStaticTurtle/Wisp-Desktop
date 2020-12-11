@@ -4,7 +4,7 @@
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
 				<div style="position: relative; overflow: hidden; padding-bottom: 100%; display: flex; justify-content: center; background-color: #1f1f1f;">
-					<img class="img" style="position: absolute; top: 0px; height: 100%;" v-bind:src="picture_url" />
+					<img class="img" style="position: absolute; top: 0px; height: 100%;" v-bind:src="purl" @error="purl = imp.no_img"/>
 				</div>
 
 				<div class="card-body text-center text-white" style="padding-top: 6px;padding-bottom: 0px;padding-left: 7px;padding-right: 6px;background: #1f1f1f;">
@@ -16,12 +16,22 @@
 </template>
 
 <script>
+	import no_img from '../assets/img/no_image.png';
+
 	export default {
 		name: "LibraryItem",
 		props: {
 			picture_url: String,
 			name: String,
 			id: Number,
+		},
+		data() {
+			return {
+				purl: this.picture_url,
+				imp: {
+					no_img:no_img
+				}
+			}
 		},
 		methods: {
 			click() {

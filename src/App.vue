@@ -34,6 +34,8 @@
 	import Player from './components/Player.vue'
 	import Notifications from "./components/Notifications";
 
+	/*if (process.env.NODE_ENV !== 'development') */window.__static = require('path').join(__dirname, '/assets').replace(/\\/g, '\\\\')
+
 	export default {
 		name: 'WhisperBook',
 		components: {

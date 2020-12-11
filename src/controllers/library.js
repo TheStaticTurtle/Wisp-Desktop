@@ -198,9 +198,6 @@ function controller(db) {
 		event.sender.send("loading", "loading");
 		resyncLibraries(db, event).then(function (books) {
 			event.sender.send("end_loading", "Sync finished");
-
-			event.sender.send("new_file", "C:/Users/tugle/Music/AudioBooks/Ready Player One/ch01.wav");
-
 		}).catch(function (err) {
 			console.error(err)
 			event.sender.send("end_loading", "Error while syncing: "+err);
