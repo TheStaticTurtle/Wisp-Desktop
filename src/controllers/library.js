@@ -6,6 +6,8 @@ const mm = require('music-metadata');
 const dataurl = require('dataurl');
 const md5 = require('md5');
 
+const ALLOWED_EXTS = [".wav",".mp3",".ogg",".webm",".flac",".aac"];
+
 function globPromise (dir, asObject = false) {
 	return new Promise ((resolve, reject) => {
 		glob(path.resolve(`${dir}/**/*`), {strict: false, silent: true, nodir: true}, (err, files) => {
@@ -48,7 +50,10 @@ function resyncLibraries(db, event) {
 					let file_data = null;
 					const ext = path.extname(walk_results[i])
 
-					if(!["wav","mp3","ogg","webm","flac","aac"].includes(ext)) continue;
+					if(!ALLOWED_EXTS.includes(ext)) {
+						console.log(ext)
+						continue;
+					}
 
 					try{
 						file_data = await mm.parseFile(walk_results[i])
