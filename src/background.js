@@ -5,9 +5,10 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const os = require('os');
+
 const Sequelize = require("sequelize");
 
 const libraryPath = path.join(os.homedir(), "Music/WhisperBook/")
@@ -30,8 +31,8 @@ const db = {
 	sequelize: sequelize
 }
 
-sequelize.sync({ force: true })
 
+sequelize.sync({ force: true })
 
 require("./controllers/library").controller(db)
 require("./controllers/audio").controller(db)
@@ -42,10 +43,12 @@ protocol.registerSchemesAsPrivileged([
 
 async function createWindow() {
 	// Create the browser window.
-	console.log(path.join(__static, "icons/256x256.png"))
 	const win = new BrowserWindow({
 		width: 800,
 		height: 600,
+		show: isDevelopment,
+		backgroundColor: '#252525',
+		darkTheme: true,
 		icon: path.join(__static, "icons/256x256.png"),
 		webPreferences: {
 			nodeIntegration: true,
@@ -53,7 +56,9 @@ async function createWindow() {
 			enableRemoteModule: true
 		}
 	})
-	win.setBackgroundColor('#ff0000')
+	win.once('ready-to-show', async () => {
+		win.show()
+	})
 
 	if (process.env.WEBPACK_DEV_SERVER_URL) {
 		await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
