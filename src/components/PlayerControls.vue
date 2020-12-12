@@ -1,10 +1,10 @@
 <template>
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
 		<div class="col-md-2 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
-			<span class="d-block">
-				<strong>{{ player.book_name }}</strong>
+			<span class="d-block" @click="gotoBook">
+				<strong>{{ player.book ? player.book.name : "" }}</strong>
 			</span>
-			<span class="d-block">{{ player.chapter_name }}</span>
+			<span class="d-block">{{ player.chapter ? player.chapter.chapter_name : ""}}</span>
 		</div>
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
@@ -41,7 +41,7 @@
 							@mouseup="is_draging = false"
 							@mousedown="is_draging = true"
 							v-model="progress"
-							v-bind:class="{'slider-thumb-red-dark':player.playing,'slider-thumb-orange-dark':player.buffering_audio || !player.playing}"
+							v-bind:class="{'slider-thumb-red-dark':player.playing,'slider-thumb-orange-dark':player.buffering_audio || !player.playing, 'hidden': this.player.buffering_audio||this.player.current_file_duration===0}"
 							style="position: absolute; top:10px; left:14px; height: 5px; width: calc(100% - 28px); z-index:2;"
 							class="slider-progress"
 							type="range"
@@ -89,14 +89,18 @@
 		name: "PlayerControls",
 		computed: {
 			getHumanPosition() {
-				return new Date(this.player.current_file_position * 1000).toISOString().substr(11, 8)
+				return new Date((this.player.current_file_position ? this.player.current_file_position : 0) * 1000).toISOString().substr(11, 8)
 			},
 			getHumanDuration() {
 				//return new Date(this.duration * 1000).toISOString().substr(11, 8)
-				return new Date(this.player.current_file_duration * 1000).toISOString().substr(11, 8)
+				console.log(this.player.current_file_duration)
+				return new Date((this.player.current_file_duration ? this.player.current_file_duration : 0) * 1000).toISOString().substr(11, 8)
 			},
 		},
 		methods: {
+			gotoBook() {
+				this.$emit("GotoCurrentBook", {})
+			},
 			emitValues: function () {
 				this.$emit("VSUpdate", {
 					speed: this.processed_speed,
@@ -115,7 +119,7 @@
 			},
 			player: {
 				handler () {
-					this.progress = this.is_draging ? this.progress : this.player.current_file_position
+					this.progress = this.is_draging ? this.progress : (this.player.buffering_audio ? this.player.current_file_duration : this.player.current_file_position)
 					/*this.duration = this.player.current_file_duration
 					console.log(this.player.current_file_duration)*/
 				},

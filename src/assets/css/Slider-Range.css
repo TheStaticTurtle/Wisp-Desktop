@@ -79,3 +79,7 @@
   -o-animation: initial !important;
   animation: initial !important;
 }
+
+.hidden {
+  display: none;
+}

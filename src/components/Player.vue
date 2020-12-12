@@ -17,6 +17,7 @@
 				@playerControl="playerControlCB"
 				@VSUpdate="playerVSUpdate"
 				@PositionUpdate="playerPositionUpdate"
+				@GotoCurrentBook="playerGotoCurrentBook"
 		></PlayerControls>
 	</div>
 </template>
@@ -49,10 +50,10 @@
 
 				player: {
 					image_url: "",
-					book_name: "",
-					chapter_name: "",
-					chapter_uh: "",
+					book: null,
+					chapter: null,
 
+					buffering_audio: false,
 					playing: false,
 
 					current_file_position: 0,
@@ -136,6 +137,10 @@
 					default:
 						break;
 				}
+			},
+			playerGotoCurrentBook() {
+				this.book_view_display_which_book = this.book;
+				this.current_view = 'BOOK'
 			},
 
 			player_toggle_pause() {
@@ -227,10 +232,8 @@
 
 			this.$electron.ipcRenderer.on('player_chapter_update', (e, data) => {
 				console.log(data)
-				t.player.image_url = data.book.picture_url
-				t.player.book_name = data.book.name
-				t.player.chapter_name = data.chapter.chapter_name
-				t.player.chapter_uh = data.chapter.unique_hash
+				t.player.book = data.book
+				t.player.chapter = data.chapter
 				t.player_start_new_file(
 					data.chapter.file_path,
 					data.next_chapter !== null ? data.next_chapter.file_path : "",

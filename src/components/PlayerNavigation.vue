@@ -19,7 +19,7 @@
 		<div v-if="display_player_related" class="row">
 			<div class="col" style="padding-bottom: 8px;padding-right: 8px;padding-left: 8px;">
 				<hr style="background: #ffffff;">
-				<img style="width: 100%;" v-bind:src="player.image_url">
+				<img style="width: 100%;" v-bind:src="player.book.picture_url">
 			</div>
 		</div>
 	</div>

@@ -53,7 +53,7 @@
 		watch: {
 			player_data: {
 				handler () {
-					this.is_playing_this_one = this.chapter.unique_hash === this.player_data.chapter_uh
+					this.is_playing_this_one = this.chapter.unique_hash === this.player_data.chapter.unique_hash
 					this.playing = this.player_data.playing
 				},
 				deep: true
