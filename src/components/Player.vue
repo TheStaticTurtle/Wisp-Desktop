@@ -139,7 +139,7 @@
 				}
 			},
 			playerGotoCurrentBook() {
-				this.book_view_display_which_book = this.book;
+				this.book_view_display_which_book = this.player.book;
 				this.current_view = 'BOOK'
 			},
 

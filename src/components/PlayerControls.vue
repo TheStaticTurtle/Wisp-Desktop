@@ -1,7 +1,7 @@
 <template>
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
 		<div class="col-md-2 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
-			<span class="d-block" @click="gotoBook">
+			<span class="d-block" @click="gotoBook" style="cursor: pointer">
 				<strong>{{ player.book ? player.book.name : "" }}</strong>
 			</span>
 			<span class="d-block">{{ player.chapter ? player.chapter.chapter_name : ""}}</span>
