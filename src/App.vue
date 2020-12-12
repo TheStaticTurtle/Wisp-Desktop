@@ -6,7 +6,7 @@
 	</head>
 	-->
 	<div id="app" class="text-light" style="background: #252525;height: 100vh;">
-		<!-- <img alt="Vue logo" src="./assets/logo.png"> -->
+		<!-- <img alt="Vue logo" src="./assets/icon.png"> -->
 		<Player></Player>
 		<Notifications></Notifications>
 	</div>

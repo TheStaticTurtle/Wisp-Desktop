@@ -12,6 +12,11 @@ module.exports = {
 			files: [
 				"**/*"
 			],
+			builderOptions: {
+				win: {
+					icon: "assets/logo/logo_512.png"
+				}
+			}
 		}
 	}
 }
