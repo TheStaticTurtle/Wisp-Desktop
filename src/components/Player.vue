@@ -143,6 +143,13 @@
 				this.current_view = 'BOOK'
 			},
 
+			handler_chapter_end() {
+				//console.log(this)
+				if(this.player.file_sound_next !== "") {
+					this.$electron.ipcRenderer.send("player_control_request", "next")
+				}
+			},
+
 			player_toggle_pause() {
 				if(this.player.playing) this.player.sound_current.pause();
 				else this.player.sound_current.play();
@@ -157,8 +164,8 @@
 					this.player.file_sound_current = file
 					if(next_file !== "") {
 						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
-						this.player.file_sound_next = next_file
 					}
+					this.player.file_sound_next = next_file
 				}
 				else if(file === this.player.file_sound_next) { //Do we already have the next file prepared ?
 					this.player.sound_current = this.player.sound_next;
@@ -166,15 +173,15 @@
 
 					if(next_file !== "") {
 						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
-						this.player.file_sound_next = next_file
 					}
+					this.player.file_sound_next = next_file
 				} else { //Nope reprepare it
 					this.player.sound_current = new Audio("safe-file-protocol://"+encodeURIComponent(file));
 					this.player.file_sound_current = file
 					if(next_file !== "") {
 						this.player.sound_next = new Audio("safe-file-protocol://"+encodeURIComponent(next_file));
-						this.player.file_sound_next = next_file
 					}
+					this.player.file_sound_next = next_file
 				}
 
 				this.player.sound_current.play();
@@ -187,41 +194,42 @@
 				t.player.buffering_audio = true
 				this.player.sound_current.addEventListener('canplaythrough', () => {
 					t.player.buffering_audio = false
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('play', () => {
 					t.player.playing = true
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('pause', () => {
 					t.player.playing = true
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('pause', () => {
 					t.player.playing = false
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('ended', () => {
 					t.player.playing = false
-					this.send_player_status_over_ipc();
+					t.handler_chapter_end()
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('timeupdate', () => {
 					t.player.current_file_position = t.player.sound_current.currentTime
 					t.player.current_file_duration = t.player.sound_current.duration
 					t.player.buffering_audio = false
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('durationchange', () => {
 					t.player.current_file_duration = t.player.sound_current.duration
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('volumechange', () => {
 					t.player.current_volume = t.player.sound_current.volume
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 				this.player.sound_current.addEventListener('ratechange', () => {
 					t.player.current_speed = t.player.sound_current.playbackRate
-					this.send_player_status_over_ipc();
+					t.send_player_status_over_ipc();
 				});
 			}
 		},
