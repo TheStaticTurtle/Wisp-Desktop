@@ -1,5 +1,9 @@
 <template>
 	<div class="row" style="background: #313131;padding-bottom: 16px;">
+		<!--<div class="col" style="padding-bottom: 8px;padding-right: 8px;padding-left: 8px;">
+			<hr style="background: #ffffff;">
+			<img style="width: 100%;" v-bind:src="player.book.picture_url">
+		</div>-->
 		<div class="col-12 col-lg-2 col-xl-2 text-light" style="padding-top: 15px;text-align: center;">
 			<span class="d-block" @click="gotoBook" style="cursor: pointer">
 				<strong>{{ player.book ? player.book.name : "" }}</strong>

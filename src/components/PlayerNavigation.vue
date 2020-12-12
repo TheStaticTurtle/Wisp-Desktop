@@ -1,5 +1,5 @@
 <template>
-	<div class="col-md-2 col-lg-2 col-xl-2 d-flex flex-column" style="background: #1f1f1f;">
+	<div class="col-12 col-sm-3 col-lg-2 col-xl-2 d-flex flex-column" style="background: #1f1f1f;">
 		<div class="row flex-grow-1">
 			<div class="col text-light" style="padding-top: 16px;">
 				<div class="row" style="padding-bottom: 4px;">
@@ -25,7 +25,7 @@
 				</div>
 			</div>
 		</div>
-		<div v-if="display_player_related" class="row">
+		<div v-if="display_player_related" class="row d-none d-sm-block">
 			<div class="col" style="padding-bottom: 8px;padding-right: 8px;padding-left: 8px;">
 				<hr style="background: #ffffff;">
 				<img style="width: 100%;" v-bind:src="player.book.picture_url">

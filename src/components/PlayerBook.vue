@@ -1,17 +1,30 @@
 <template>
-	<div class="col-md-10 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 8px;padding-left: 16px;padding-right: 16px;">
+	<div class="col-12 col-sm-9 col-md-9 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 8px;padding-left: 16px;padding-right: 16px;">
 		<div class="row no-gutters d-flex flex-grow-1" style="overflow-y: scroll;height: 1px;margin-bottom: 15px;">
 			<div class="col" style="padding: 5px;">
 				<div class="row no-gutters d-flex flex-row">
-					<div class="col-md-3" style="padding: 16px;"><img class="img-fluid" v-bind:src="book.picture_url"></div>
+					<div class="col-3 d-flex align-items-center p-sm-0" style="padding: 16px;">
+						<img class="img-fluid" v-bind:src="book.picture_url">
+					</div>
 					<div class="col" style="padding-top: 16px;margin-left: 16px;">
-						<h1 class="text-light">{{ book.name }}</h1>
-						<p class="text-muted" style="margin-bottom: 4px;">By: {{ getBookReaders(book) }}</p>
-						<p class="text-muted">{{ book.chapters.length }} Chapters {{ getHumanBookDuration(book) }}</p>
-						<button @click="start_read_book" class="btn btn-danger btn-lg" type="button">
-							<i class="icon-control-play" style="margin-right: 16px;"></i>
-							Start listening
-						</button>
+						<div class="row no-gutters">
+							<h1 class="text-light text-center d-none d-lg-block ">{{ book.name }}</h1>
+							<h2 class="text-light text-center d-none d-md-block d-lg-none">{{ book.name }}</h2>
+							<h3 class="text-light text-center d-none d-xl-block d-md-none d-lg-none">{{ book.name }}</h3>
+							<h4 class="text-light text-center d-none d-sm-block d-xl-none d-md-none d-lg-none">{{ book.name }}</h4>
+						</div>
+						<div class="row no-gutters">
+							<div class="col-12 pb-3 mr-2">
+								<button @click="start_read_book" class="btn btn-danger btn-lg m-0 p-1 btn h-100 w-100" type="button">
+									<i class="icon-control-play" style="margin-right: 8px;"></i>
+									Start listening
+								</button>
+							</div>
+							<div class="col">
+								<p class="text-muted" style="margin-bottom: 4px;">By: {{ getBookReaders(book) }}</p>
+								<p class="text-muted">{{ book.chapters.length }} Chapters {{ getHumanBookDuration(book) }}</p>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="row no-gutters d-flex flex-row">

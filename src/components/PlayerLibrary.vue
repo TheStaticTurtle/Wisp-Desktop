@@ -1,5 +1,5 @@
 <template>
-	<div class="col-md-10 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
+	<div class="col-12 col-sm-9 col-md-9 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 
 		<nav class="navbar navbar-light m-0 p-0">
 			<h1 class="text-light m-0">My library</h1>
