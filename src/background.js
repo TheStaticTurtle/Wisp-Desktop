@@ -32,7 +32,7 @@ const db = {
 }
 
 
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
 
 require("./controllers/library").controller(db)
 require("./controllers/audio").controller(db)
