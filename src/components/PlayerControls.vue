@@ -9,13 +9,13 @@
 		<div class="col-md-8 col-lg-8 col-xl-8">
 			<div class="row" style="min-height: 65px;margin-top: 16px;">
 				<div class="col" style="font-size: 20px;text-align: center;padding: 15px;">
-					<a @click="()=>{if(enable_controls) $emit('playerControl','previous');}" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons " href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','previous');}" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons " href="#" style="padding: 20px;">
 						<i class="icon-control-start"></i>
 					</a>
-					<a @click="()=>{if(enable_controls) $emit('playerControl','playpause'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons" href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','playpause'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons" href="#" style="padding: 20px;">
 						<i v-bind:class="{ 'icon-control-pause': player.playing, 'icon-control-play': !player.playing }" class="icon-control-play"></i>
 					</a>
-					<a @click="()=>{if(enable_controls) $emit('playerControl','next'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="control-buttons" href="#" style="padding: 20px;">
+					<a @click="()=>{if(enable_controls) $emit('playerControl','next'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons" href="#" style="padding: 20px;">
 						<i class="icon-control-end"></i>
 					</a>
 				</div>
@@ -65,7 +65,7 @@
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="fa fa-volume-up"></i>
 					</a>
-					<input v-model="range_volume_control" class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100"  style="height: 4px;">
+					<input @dblclick="range_volume_control = 85" v-model="range_volume_control" class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100"  style="height: 4px;">
 				</div>
 			</div>
 
@@ -77,7 +77,7 @@
 					<a class="text-light" href="#" style="padding-right: 20px;">
 						<i class="icon-speedometer"></i>
 					</a>
-					<input v-model="range_speed_control" class="slider slider-thumb-orange" type="range" min="25" max="250" step="15" style="height: 4px;" >
+					<input @dblclick="range_speed_control = 100" v-model="range_speed_control" class="slider slider-thumb-orange" type="range" min="25" max="250" step="15" style="height: 4px;" >
 				</div>
 			</div>
 		</div>
