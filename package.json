@@ -50,6 +50,7 @@
     "electron-icon-builder": "^1.0.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "flexsearch": "^0.6.32",
     "howler": "^2.2.1",
     "md5": "^2.3.0",
     "vue-cli-plugin-electron-builder": "~2.0.0-rc.5",

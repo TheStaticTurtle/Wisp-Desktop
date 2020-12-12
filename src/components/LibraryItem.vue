@@ -4,11 +4,11 @@
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
 				<div style="position: relative; overflow: hidden; padding-bottom: 100%; display: flex; justify-content: center; background-color: #1f1f1f;">
-					<img class="img" style="position: absolute; top: 0px; height: 100%;" v-bind:src="purl" @error="purl = imp.no_img"/>
+					<img class="img" style="position: absolute; top: 0px; height: 100%;" v-bind:src="purl" @error="has_errored_image = true"/>
 				</div>
 
 				<div class="card-body text-center text-white" style="padding-top: 6px;padding-bottom: 0px;padding-left: 7px;padding-right: 6px;background: #1f1f1f;">
-					<p class="card-title" style="font-weight: lighter">{{ name }}</p>
+					<p class="card-title" style="font-weight: lighter">{{ book.name }}</p>
 				</div>
 			</div>
 		</button>
@@ -21,13 +21,16 @@
 	export default {
 		name: "LibraryItem",
 		props: {
-			picture_url: String,
-			name: String,
-			id: Number,
+			book: Object,
+		},
+		computed: {
+			purl() {
+				return this.has_errored_image ? this.imp.no_img : this.book.picture_url;
+			}
 		},
 		data() {
 			return {
-				purl: this.picture_url,
+				has_errored_image: false,
 				imp: {
 					no_img:no_img
 				}

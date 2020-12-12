@@ -1,12 +1,20 @@
 <template>
 	<div class="col-md-10 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
-		<h1 class="text-light">My library</h1>
-		<hr class="d-flex" style="background: #ffffff;width: 100%;">
+
+		<nav class="navbar navbar-light m-0 p-0">
+			<h1 class="text-light m-0">My library</h1>
+
+			<form class="form-inline ml-3 flex-grow-1 " style="padding-top: 7px" >
+				<input v-model="searchTerms" class="form-control btn-outline-danger text-white mr-sm-2 bg-transparent" style="width: 100%" type="search" placeholder="Search" aria-label="Search">
+			</form>
+		</nav>
+
+		<div class="row p-0" style="">
+			<hr class="d-flex" style="background: #ffffff;width: 100%;">
+		</div>
 		<div class="row d-flex flex-grow-1" style="overflow-y: auto;height: 1px;margin-bottom: 15px;">
 
-			<LibraryItem v-for="(book, index) in books" :key="book.id" :name="book.name" :picture_url="book.picture_url" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
-
-
+			<LibraryItem v-for="book in actual_books" :key="book.id" :book="book" @libraryBookClick="libraryBookClick"></LibraryItem>
 
 			<div class="col-sm-3 col-md-2 col-lg-2 col-xl-2 offset-xl-0 align-self-start" style="padding: 5px;">
 				<button @click="add_library" id="add_new_library" class="btn btn-warning" type="button" style="padding: 1px;">
@@ -28,6 +36,8 @@
 
 <script>
 	import LibraryItem from "./LibraryItem";
+	const FlexSearch = require("flexsearch");
+
 
 	export default {
 		name: "PlayerLibrary",
@@ -35,8 +45,48 @@
 		props: {
 			books: Array,
 		},
-
+		mounted() {
+			this.updateSearchResult("");
+			console.log(this.books)
+			this.search_index = FlexSearch.create({
+				depth: 3,
+				doc: {
+					id: "unique_hash",
+					field: "name"
+				}
+			});
+			this.search_index.add(this.books)
+		},
+		data() {
+			return {
+				searchTerms: "",
+				actual_books: [],
+				search_index: null,
+			}
+		},
+		watch: {
+			searchTerms: {
+				handler: function(val) {
+					this.updateSearchResult(val);
+				},
+				deep: true
+			},
+			books: {
+				handler: function(new_books) {
+					this.search_index.clear()
+					this.search_index.add(new_books)
+				},
+				deep: true
+			}
+		},
 		methods: {
+			async updateSearchResult(arg) {
+				if (arg === "") {
+					this.actual_books = this.books;
+					return;
+				}
+				this.actual_books = await this.search_index.search(arg)
+			},
 			libraryBookClick(arg) {
 				this.$emit('libraryBookClick', arg)
 			},
