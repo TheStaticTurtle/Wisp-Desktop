@@ -1,5 +1,5 @@
 <template>
-	<div class="col-sm-3 col-md-2 col-lg-2 col-xl-2 offset-xl-0 align-self-start" style="padding: 5px;">
+	<div class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start" style="padding: 5px;">
 		<button @click="click" class="btn btn-primary" type="button" style="padding: 1px; width: 100%">
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
@@ -22,6 +22,7 @@
 		name: "LibraryItem",
 		props: {
 			book: Object,
+			id: Number,
 		},
 		computed: {
 			purl() {

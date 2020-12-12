@@ -54,3 +54,13 @@
   color: #6c757d !important;
   text-decoration: none;
 }
+
+@font-face {
+  font-family: Dosis;
+  src: url("../fonts/Dosis-VariableFont_wght.ttf");
+}
+
+.app-title {
+  font-family: Dosis, serif;
+  font-weight: 800;
+}

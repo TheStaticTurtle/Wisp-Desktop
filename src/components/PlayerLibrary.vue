@@ -14,7 +14,7 @@
 		</div>
 		<div class="row d-flex flex-grow-1" style="overflow-y: auto;height: 1px;margin-bottom: 15px;">
 
-			<LibraryItem v-for="book in actual_books" :key="book.id" :book="book" @libraryBookClick="libraryBookClick"></LibraryItem>
+			<LibraryItem v-for="(book,index) in actual_books" :key="book.id" :book="book" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
 
 			<div class="col-sm-3 col-md-2 col-lg-2 col-xl-2 offset-xl-0 align-self-start" style="padding: 5px;">
 				<button @click="add_library" id="add_new_library" class="btn btn-warning" type="button" style="padding: 1px;">
