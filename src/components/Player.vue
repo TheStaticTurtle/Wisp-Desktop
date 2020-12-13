@@ -1,24 +1,35 @@
 <template>
-	<div class="container-fluid d-flex flex-column" style="height: 100%;">
-		<div class="row flex-grow-1">
-			<template  v-if="!is_loading">
-				<PlayerNavigation :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
-				<PlayerLibrary v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
-				<PlayerBook v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
+	<div class="container-fluid d-flex flex-column" style="height: 100vh;">
+
+		<!--TODO: Find a pure css version of displaying this f-king navigation bar properly. Just gave up here -->
+		<PlayerNavigation
+				class="d-sm-none"
+				style="margin: -15px; padding: 15px 0; width: calc(100% + 30px);"
+				:display_player_related="enable_controls"
+				:player="player" @navigationClick="navigationClick"
+		></PlayerNavigation>
+
+		<div class="row d-flex flex-grow-1">
+			<template v-if="!is_loading">
+				<!--TODO: CF toto ln 4 --> <PlayerNavigation class="d-none d-sm-flex" :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
+				<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
+				<PlayerBook  v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 			</template >
 
 			<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
-		<PlayerControls
-				:enable_controls="enable_controls"
-				:player="player"
-				@playerControl="playerControlCB"
-				@VSUpdate="playerVSUpdate"
-				@PositionUpdate="playerPositionUpdate"
-				@GotoCurrentBook="playerGotoCurrentBook"
-		></PlayerControls>
+		<div class="w-100">
+			<PlayerControls
+					:enable_controls="enable_controls"
+					:player="player"
+					@playerControl="playerControlCB"
+					@VSUpdate="playerVSUpdate"
+					@PositionUpdate="playerPositionUpdate"
+					@GotoCurrentBook="playerGotoCurrentBook"
+			></PlayerControls>
+		</div>
 	</div>
 </template>
 

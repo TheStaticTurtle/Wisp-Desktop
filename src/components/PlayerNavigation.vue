@@ -1,5 +1,5 @@
 <template>
-	<div class="col-12 col-sm-3 col-lg-2 col-xl-2 d-flex flex-column" style="background: #1f1f1f;">
+	<div class="col-sm-3 col-lg-2 col-xl-2 flex-column" style="background: #1f1f1f;">
 		<div class="row flex-grow-1">
 			<div class="col text-light" style="padding-top: 16px;">
 				<div class="row" style="padding-bottom: 4px;">
@@ -8,20 +8,21 @@
 					</div>
 				</div>
 				<div class="row" style="padding: 8px;padding-bottom: 4px;">
-					<div class="col">
+					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">
 						<a @click="goto_home" class="text-light no-underline" href="#" style="font-size: 20px;">
-							<i class="icon-home" style="margin-right: 20px;"></i>Home</a>
+							<i class="icon-home" style="margin-right: 20px;"></i>Home
+						</a>
 					</div>
-				</div>
-				<div class="row" style="padding: 8px;padding-bottom: 4px;">
-					<div class="col"><a class="text-light no-underline" href="#" style="font-size: 20px;">
-						<i class="icon-folder-alt" style="margin-right: 20px;"></i>Libraries</a>
+					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">
+						<a class="text-light no-underline" href="#" style="font-size: 20px;">
+							<i class="icon-folder-alt" style="margin-right: 20px;"></i>Libraries
+						</a>
 					</div>
-				</div>
-
-				<div class="row" style="padding: 8px;padding-bottom: 4px;">
-					<div class="col"><a @click="resync_library" class="text-light no-underline" href="#" style="font-size: 20px;">
-						<i class="icon-refresh" style="margin-right: 20px;"></i>Resync</a></div>
+					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">
+						<a @click="resync_library" class="text-light no-underline" href="#" style="font-size: 20px;">
+							<i class="icon-refresh" style="margin-right: 20px;"></i>Resync
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>

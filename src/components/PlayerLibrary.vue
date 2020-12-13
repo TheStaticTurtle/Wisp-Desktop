@@ -1,10 +1,10 @@
 <template>
 	<div class="col-12 col-sm-9 col-md-9 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 
-		<nav class="navbar navbar-light m-0 p-0">
-			<h1 class="text-light m-0">My library</h1>
+		<nav class="navbar navbar-light m-0 p-0 d-flex justify-content-center">
+			<h1 class="text-light m-0 pr-3">My library</h1>
 
-			<form class="form-inline ml-3 flex-grow-1 " style="padding-top: 7px" >
+			<form class="form-inline  flex-grow-1 " style="padding-top: 7px" >
 				<input v-model="searchTerms" class="form-control btn-outline-danger text-white mr-sm-2 bg-transparent" style="width: 100%" type="search" placeholder="Search" aria-label="Search">
 			</form>
 		</nav>
