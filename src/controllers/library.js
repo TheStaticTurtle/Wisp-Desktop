@@ -34,60 +34,76 @@ function globPromise (dir, asObject = false) {
 	})
 }
 
-function resyncLibraries(db, event) {
-	return new Promise(function(resolve, reject) {
-		let ids = []
-		db.models.Library.findAll().then(async (results)=> {
+function resyncLibraries(db, event, what_lib) {
+	return new Promise(async function(resolve, reject) {
+
+		const path_to_resync = what_lib === null ? null : (what_lib instanceof Object ? what_lib.path : what_lib)
+		const search_promise = path_to_resync === undefined || path_to_resync === null ? db.models.Library.findAll() : db.models.Library.findAll({where: { path: path_to_resync }})
+
+		console.log(path_to_resync)
+
+		search_promise.then(async (libraries_results)=> {
 			event.sender.send("library_load", "start");
 
-			let books = {}
+			for (const libraries_result of libraries_results) {
 
-			for (const result of results) {
+				event.sender.send("library_load_text", "Deleting out-of-date data");
+				//Remove existing entries for this library and re-search the unique ids
+				await db.models.Book.destroy({ where: { libraryId: libraries_result.id } })
+				let book_ids = (await db.models.Book.findAll()).map(x => {return x.unique_hash})
+				let chapter_ids = (await db.models.Chapter.findAll()).map(x => {return x.unique_hash})
 
-				const walk_results = await globPromise(result.path);
+				let new_books = {}
+
+				event.sender.send("library_load_text", "Listing files in " + libraries_result.path);
+				const walk_results = await globPromise(libraries_result.path);
 
 				for (let i = 0; i < walk_results.length; i++) {
 					let file_data = null;
-					const ext = path.extname(walk_results[i])
 
-					if(!ALLOWED_EXTS.includes(ext)) {
-						console.log(ext)
+					if (!ALLOWED_EXTS.includes(path.extname(walk_results[i]))) {
+						console.log("Extention is not allowed for file: "+walk_results[i])
 						continue;
 					}
 
-					try{
+					try {
 						file_data = await mm.parseFile(walk_results[i])
 					} catch (e) {
 						event.sender.send("ui_notify", {
 							type: "error",
-							title:"An unexpected error has occured:",
-							text: "Failed gathering metadata about file: "+walk_results[i],
+							title: "An unexpected error has occured:",
+							text: "Failed gathering metadata about file: " + walk_results[i],
 							collapse_title: "Stacktrace",
 							collapse: e.stack || e.toString()
 						});
+						continue;
 					}
-					if(file_data===null) continue;
 
-					if(file_data.common.album === null) file_data.common.album = "Unknown book"
-
-					if(
-						!file_data.common.hasOwnProperty("album")  || file_data.common.album === "" || file_data.common.album === null ||
-						!file_data.common.hasOwnProperty("title")  || file_data.common.title === "" || file_data.common.title === null ||
+					if (
+						!file_data.common.hasOwnProperty("album") || file_data.common.album === "" || file_data.common.album === null ||
+						!file_data.common.hasOwnProperty("title") || file_data.common.title === "" || file_data.common.title === null ||
 						!file_data.common.hasOwnProperty("artist") || file_data.common.artist === "" || file_data.common.artist === null ||
 						!file_data.common.track.hasOwnProperty("no")
 					) {
 						event.sender.send("ui_notify", {
 							type: "error",
-							title:"Failed to parse a file:",
-							text: walk_results[i] + " is missing on of those fileds: artist/album/title/track_no",
+							title: "Failed to parse a file:",
+							text: walk_results[i] + " is missing on of those fileds in his tags: artist/album/title/track_no",
 						});
 						continue;
 					}
 
-
-					if(!books.hasOwnProperty(file_data.common.album)) {
+					if(!new_books.hasOwnProperty(file_data.common.album)) {
 						const unique_book_id = await md5(file_data.common.album)
-						books[file_data.common.album] = {
+						if(book_ids.includes(unique_book_id)) {
+							event.sender.send("ui_notify", {
+								type: "warn",
+								title:"Duplicate book found",
+								text: "Found multiple entries for: "+file_data.common.album,
+							});
+							continue
+						}
+						new_books[file_data.common.album] = {
 							unique_hash: unique_book_id,
 							name: file_data.common.album,
 							picture: null,
@@ -97,22 +113,22 @@ function resyncLibraries(db, event) {
 					}
 
 					const unique_chapter_id = await md5(file_data.common.album+"_"+file_data.common.title)
-					if(ids.includes(unique_chapter_id)) {
+					if(chapter_ids.includes(unique_chapter_id)) {
 						event.sender.send("ui_notify", {
 							type: "warn",
-							title:"Duplicate found",
+							title:"Duplicate chapter found",
 							text: "Found multiple entries for: "+file_data.common.album+" / "+file_data.common.title,
 							collapse_title: "Details:",
 							collapse: "File path:" + walk_results[i]
 						});
 						continue;
 					}
-					ids.push(unique_chapter_id)
+					chapter_ids.push(unique_chapter_id)
 
-					books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
+					new_books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
 
 
-					books[file_data.common.album].chapters.push({
+					new_books[file_data.common.album].chapters.push({
 						unique_hash: unique_chapter_id,
 						file_path: walk_results[i],
 						chapter_no: file_data.common.track.no,
@@ -122,39 +138,42 @@ function resyncLibraries(db, event) {
 					})
 
 					event.sender.send("library_load_text", "Parsing file "+i+" out of "+walk_results.length);
+
+				}
+
+
+				const books_organized = []
+				for (const booksKey in new_books) books_organized.push(new_books[booksKey])
+				for (let i = 0; i < books_organized.length; i++) books_organized[i].chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
+
+
+				for (let i = 0; i < books_organized.length; i++) {
+					let b = books_organized[i]
+					b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
+					b.libraryId = libraries_result.id
+					db.models.Book.create(b, {
+						include: [ db.models.Book.chapters ]
+					}).catch((err)=>{
+
+						event.sender.send("ui_notify", {
+							type: "error",
+							title: "An unexpected error has occured:",
+							text: "Failed saving book to database: " + b.name,
+							collapse_title: "Stacktrace",
+							collapse: err.stack || err.toString()
+						});
+
+					});
+					event.sender.send("library_load_text", "Saving book "+i+" out of "+books_organized.length);
+
 				}
 			}
 
+			await reloadLibrary(db, event)
+			resolve();
 
-
-			const books_organized = []
-			for (const booksKey in books) books_organized.push(books[booksKey])
-			for (let i = 0; i < books_organized.length; i++) books_organized[i].chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
-
-
-			await db.models.Chapter.destroy({
-				truncate: true
-			});
-			await db.models.Book.destroy({
-				truncate: true
-			});
-
-			for (let i = 0; i < books_organized.length; i++) {
-				let b = books_organized[i]
-				b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
-				db.models.Book.create(b, {
-					include: [ db.models.Book.chapters ]
-				});
-				event.sender.send("library_load_text", "Saving book "+i+" out of "+books_organized.length);
-			}
-
-			event.sender.send("library_load", "stop");
-
-			event.sender.send("library_update", books_organized);
-			resolve(books_organized);
 		}).catch(reject);
-
-	})
+	});
 }
 function reloadLibrary(db, event) {
 	return new Promise(function(resolve, reject) {
@@ -207,7 +226,7 @@ function controller(db) {
 
 	ipcMain.on("force_resync",function (event, arg) {
 		event.sender.send("loading", "loading");
-		resyncLibraries(db, event).then(function (books) {
+		resyncLibraries(db, event, arg).then(function (books) {
 			event.sender.send("end_loading", "Sync finished");
 		}).catch(function (err) {
 			console.error(err)
@@ -226,22 +245,25 @@ function controller(db) {
 			db.models.Library.sync().then(() => {
 				db.models.Library.create({
 					path: r.filePaths[0],
-				}).then(function () {
+					books: []
+				}).then(function (new_lib) {
+
 					event.sender.send("library_load_text", "Starting to sync the new library");
-					resyncLibraries(db, event).then(function () {
+
+					resyncLibraries(db, event, new_lib).then(function () {
 						event.sender.send("end_loading", "Sync finished");
 					}).catch(function (err) {
 						console.error(err)
 						event.sender.send("end_loading", "Error while syncing: "+err);
 					})
+
 				}).catch(function () {
-					event.sender.send("library_load_text", "This library already exist. It will resync it tho");
-					resyncLibraries(db, event).then(function () {
-						event.sender.send("end_loading", "Sync finished");
-					}).catch(function (err) {
-						console.error(err)
-						event.sender.send("end_loading", "Error while syncing: "+err);
-					})
+					event.sender.send("ui_notify", {
+						type: "warn",
+						title:"This library already exist.",
+						text: "You can go to the settings to reload it.",
+					});
+					event.sender.send("end_loading", "Sync finished");
 				});
 			});
 

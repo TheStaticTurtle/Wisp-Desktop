@@ -10,8 +10,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 	});
 
-	//var Chapter = sequelize.import(path.join(__dirname, 'course'));
-	//Book.hasMany(Chapter);
+	Library.books = Library.hasMany(sequelize.models.book);
 
 	return Library;
 }

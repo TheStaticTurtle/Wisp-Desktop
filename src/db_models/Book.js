@@ -19,7 +19,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 	});
 
-	Book.chapters = Book.hasMany(sequelize.models.chapter);
+	Book.chapters = Book.hasMany(sequelize.models.chapter, { onDelete: 'cascade', hooks: true,  });
 
 
 	return Book;

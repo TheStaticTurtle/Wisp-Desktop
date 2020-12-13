@@ -6,17 +6,18 @@
 		Maybe rename the component to PlayerNavigationTiny strip down all un-nessearies parts and replace PlayerNavigation with a new one that imports PlayerNavigationTiny
 		-->
 		<PlayerNavigation
+				v-if="current_view!=='LIBRARIES'"
 				class="d-sm-none"
 				style="margin: -15px; padding: 15px 0; width: calc(100% + 30px);"
 				:display_player_related="enable_controls"
 				:player="player" @navigationClick="navigationClick"
 		></PlayerNavigation>
 
-		<AppLibraries
+		<AppSettings
 				style="padding: 0 0; "
 				v-if="current_view==='LIBRARIES'"
 				@navigationClick="navigationClick"
-		></AppLibraries>
+		></AppSettings>
 
 		<div v-if="current_view!=='LIBRARIES'" class="row d-flex flex-grow-1">
 			<template v-if="!is_loading">
@@ -49,11 +50,11 @@
 	import PlayerNavigation from "./PlayerNavigation";
 	import Loading from "./Loading";
 	import PlayerBook from "./PlayerBook";
-	import AppLibraries from "./AppLibraries";
+	import AppSettings from "./AppSettings";
 
 	export default {
 		name: 'Player',
-		components: {AppLibraries, PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
+		components: {AppSettings, PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
 		/*props: {
           msg: String
         }*/

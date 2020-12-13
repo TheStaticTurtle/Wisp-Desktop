@@ -3,6 +3,9 @@ import { app, protocol, BrowserWindow, ipcMain  } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 
+const debugSequelize = require('debug')('wisp:sequelize')
+const debugElectron = require('debug')('wisp:electron')
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const path = require('path');
@@ -16,11 +19,12 @@ if (!fs.existsSync(libraryPath)) fs.mkdirSync(libraryPath);
 
 const sequelize = new Sequelize({
 	dialect: 'sqlite',
+	logging: (msg) => {debugSequelize(msg)},
 	storage: path.join(libraryPath,'WhisperBook.sqlite')
 });
 sequelize.authenticate()
-	.then(() => { console.log('Connection successfully made.'); })
-	.catch(console.error);
+	.then(() => { debugSequelize('Connection successfully made.'); })
+	.catch(debugSequelize);
 
 const db = {
 	models: {
@@ -32,7 +36,7 @@ const db = {
 }
 
 
-sequelize.sync({ alter: true })
+sequelize.sync({ force: true })
 
 require("./controllers/library").controller(db)
 require("./controllers/audio").controller(db)
@@ -89,7 +93,7 @@ app.on('ready', async () => {
 		try {
 			await installExtension(VUEJS_DEVTOOLS)
 		} catch (e) {
-			console.error('Vue Devtools failed to install:', e.toString())
+			debugElectron('Vue Devtools failed to install:', e.toString())
 		}
 	}
 
@@ -101,7 +105,7 @@ app.on('ready', async () => {
 		}
 		catch (error) {
 			// Handle the error as needed
-			console.error(error)
+			debugElectron(error)
 		}
 	});
 
