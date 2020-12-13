@@ -1,7 +1,10 @@
 <template>
 	<div class="container-fluid d-flex flex-column" style="height: 100vh;">
 
-		<!--TODO: Find a pure css version of displaying this f-king navigation bar properly. Just gave up here -->
+		<!--
+		TODO: Find a pure css version of displaying this f-king navigation bar properly. Just gave up here
+		Maybe rename the component to PlayerNavigationTiny strip down all un-nessearies parts and replace PlayerNavigation with a new one that imports PlayerNavigationTiny
+		-->
 		<PlayerNavigation
 				class="d-sm-none"
 				style="margin: -15px; padding: 15px 0; width: calc(100% + 30px);"
@@ -9,7 +12,13 @@
 				:player="player" @navigationClick="navigationClick"
 		></PlayerNavigation>
 
-		<div class="row d-flex flex-grow-1">
+		<AppLibraries
+				style="padding: 0 0; "
+				v-if="current_view==='LIBRARIES'"
+				@navigationClick="navigationClick"
+		></AppLibraries>
+
+		<div v-if="current_view!=='LIBRARIES'" class="row d-flex flex-grow-1">
 			<template v-if="!is_loading">
 				<!--TODO: CF toto ln 4 --> <PlayerNavigation class="d-none d-sm-flex" :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 				<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
@@ -20,6 +29,7 @@
 				<Loading v-bind:text="loading_text"></Loading>
 			</div>
 		</div>
+
 		<div class="w-100">
 			<PlayerControls
 					:enable_controls="enable_controls"
@@ -39,10 +49,11 @@
 	import PlayerNavigation from "./PlayerNavigation";
 	import Loading from "./Loading";
 	import PlayerBook from "./PlayerBook";
+	import AppLibraries from "./AppLibraries";
 
 	export default {
 		name: 'Player',
-		components: {PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
+		components: {AppLibraries, PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
 		/*props: {
           msg: String
         }*/
@@ -97,6 +108,9 @@
 				switch (arg) {
 					case "HOME":
 						this.current_view = 'LIBRARY'
+						break;
+					case "LIBRARIES":
+						this.current_view = 'LIBRARIES'
 						break;
 					default:
 						console.log(arg)

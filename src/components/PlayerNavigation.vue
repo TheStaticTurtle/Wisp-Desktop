@@ -14,7 +14,7 @@
 						</a>
 					</div>
 					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">
-						<a class="text-light no-underline" href="#" style="font-size: 20px;">
+						<a @click="goto_libraries" class="text-light no-underline" href="#" style="font-size: 20px;">
 							<i class="icon-folder-alt" style="margin-right: 20px;"></i>Libraries
 						</a>
 					</div>
@@ -40,6 +40,9 @@
 	export default {
 		name: "PlayerNavigation",
 		methods: {
+			goto_libraries() {
+				this.$emit('navigationClick', "LIBRARIES")
+			},
 			goto_home() {
 				this.$emit('navigationClick', "HOME")
 			},
