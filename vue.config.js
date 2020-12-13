@@ -14,7 +14,11 @@ module.exports = {
 			],
 			builderOptions: {
 				win: {
-					icon: "assets/logo/logo_512.png"
+					icon: "public/icons/icon.png"
+				},
+				nsis: {
+					oneClick: false,
+					installerIcon : "public/icons/icon.ico",
 				}
 			}
 		}
