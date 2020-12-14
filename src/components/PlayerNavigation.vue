@@ -15,7 +15,7 @@
 					</div>
 					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">
 						<a @click="goto_libraries" class="text-light no-underline" href="#" style="font-size: 20px;">
-							<i class="icon-folder-alt" style="margin-right: 20px;"></i>Libraries
+							<i class="icon-settings" style="margin-right: 20px;"></i>Settings
 						</a>
 					</div>
 					<div class="col col-sm-12 pt-2 d-flex justify-content-center justify-content-sm-start">

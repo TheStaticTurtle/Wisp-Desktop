@@ -15,20 +15,21 @@
 
 		<AppSettings
 				style="padding: 0 0; "
-				v-if="current_view==='LIBRARIES'"
+				v-if="current_view==='LIBRARIES' && !is_loading"
+				:libraries="libraries"
 				@navigationClick="navigationClick"
 		></AppSettings>
 
-		<div v-if="current_view!=='LIBRARIES'" class="row d-flex flex-grow-1">
-			<template v-if="!is_loading">
-				<!--TODO: CF toto ln 4 --> <PlayerNavigation class="d-none d-sm-flex" :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
-				<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
-				<PlayerBook  v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
-			</template >
+		<div v-if="current_view!=='LIBRARIES' && !is_loading" class="row d-flex flex-grow-1">
+			<!--TODO: CF toto ln 4 -->
+			<PlayerNavigation class="d-none d-sm-flex" :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 
-			<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
-				<Loading v-bind:text="loading_text"></Loading>
-			</div>
+			<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
+			<PlayerBook  v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
+		</div>
+
+		<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
+			<Loading v-bind:text="loading_text"></Loading>
 		</div>
 
 		<div class="w-100">
@@ -69,6 +70,7 @@
 
 				book_view_display_which_book: null,
 
+				libraries: [],
 				books: [],
 
 				player: {
@@ -263,6 +265,7 @@
 			const t = this
 
 			this.$electron.ipcRenderer.send("force_reload");
+			this.$electron.ipcRenderer.send("get_libraries");
 
 			this.$electron.ipcRenderer.on('player_chapter_update', (e, data) => {
 				console.log(data)
@@ -272,27 +275,37 @@
 					data.chapter.file_path,
 					data.next_chapter !== null ? data.next_chapter.file_path : "",
 				)
+				console.log("player_chapter_update")
 			})
+
 
 			/*
 				Event listeners concerning  the library
 			 */
-			this.$electron.ipcRenderer.on('library_load', () => {
-				t.loading_text = "";
-			})
 			this.$electron.ipcRenderer.on('loading', () => {
+				t.loading_text = "";
 				t.is_loading = true;
+				console.log("loading")
 			})
 			this.$electron.ipcRenderer.on('end_loading', () => {
 				t.is_loading = false;
+				console.log("end_loading")
 			})
 			this.$electron.ipcRenderer.on('library_load_text', (event, arg) => {
 				t.loading_text = arg
+				console.log("library_load_text")
 			})
 			this.$electron.ipcRenderer.on('library_update', (event, arg) => {
 				this.current_view = 'LIBRARY'
 				t.books = arg;
+				console.log("library_update")
 			})
+			this.$electron.ipcRenderer.on('libraries_update', (event, arg) => {
+				t.libraries = arg
+				console.log("libraries_update")
+			})
+
+
 		},
 	}
 </script>

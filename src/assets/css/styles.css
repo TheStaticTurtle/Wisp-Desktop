@@ -64,3 +64,12 @@
   font-family: Dosis, serif;
   font-weight: 800;
 }
+
+.app-nav {
+  font-family: Dosis, serif;
+  font-weight: 500;
+}
+
+.app-nav[aria-selected="true"] > h2 {
+  border-bottom: 2px solid crimson !important;
+}

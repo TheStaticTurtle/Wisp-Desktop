@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
 		},
 	});
 
-	Library.books = Library.hasMany(sequelize.models.book);
+	Library.books = Library.hasMany(sequelize.models.book, { onDelete: 'cascade', hooks: true,  });
 
 	return Library;
 }

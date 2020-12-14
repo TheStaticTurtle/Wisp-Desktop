@@ -19,7 +19,8 @@ if (!fs.existsSync(libraryPath)) fs.mkdirSync(libraryPath);
 
 const sequelize = new Sequelize({
 	dialect: 'sqlite',
-	logging: (msg) => {debugSequelize(msg)},
+	//logging: (msg) => {debugSequelize(msg)},
+	logging: false,
 	storage: path.join(libraryPath,'WhisperBook.sqlite')
 });
 sequelize.authenticate()

@@ -4,6 +4,9 @@
 			<div class="col-4" style="position: absolute;right: 0;top: 0; z-index:10000;padding: 6px;padding-top: 12px; overflow-y: auto; max-height: 100vh">
 				<!-- <div class="alert alert-info" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button><span><strong>Alert</strong> text.</span></div> -->
 
+				<button v-if="notifications.length>0" @click="clearAll" class="btn btn-info w-100 mb-3">
+					Clear all notifications
+				</button>
 
 				<div
 						v-for="(notification,index) in notifications"
@@ -35,6 +38,9 @@
 	export default {
 		name: "Notifications",
 		methods: {
+			clearAll() {
+				this.notifications= []
+			},
 			remove(index) {
 				this.notifications.splice(index, 1);
 			}

@@ -36,18 +36,17 @@ function globPromise (dir, asObject = false) {
 
 function resyncLibraries(db, event, what_lib) {
 	return new Promise(async function(resolve, reject) {
-
 		const path_to_resync = what_lib === null ? null : (what_lib instanceof Object ? what_lib.path : what_lib)
 		const search_promise = path_to_resync === undefined || path_to_resync === null ? db.models.Library.findAll() : db.models.Library.findAll({where: { path: path_to_resync }})
 
-		console.log(path_to_resync)
+		//Avoid spamming notifications for stupid reasons
+		let notification_already_sent_for = []
 
 		search_promise.then(async (libraries_results)=> {
-			event.sender.send("library_load", "start");
 
 			for (const libraries_result of libraries_results) {
+				updateLoadingScreenText(event, "Deleting out-of-date data");
 
-				event.sender.send("library_load_text", "Deleting out-of-date data");
 				//Remove existing entries for this library and re-search the unique ids
 				await db.models.Book.destroy({ where: { libraryId: libraries_result.id } })
 				let book_ids = (await db.models.Book.findAll()).map(x => {return x.unique_hash})
@@ -55,7 +54,7 @@ function resyncLibraries(db, event, what_lib) {
 
 				let new_books = {}
 
-				event.sender.send("library_load_text", "Listing files in " + libraries_result.path);
+				updateLoadingScreenText(event, "Listing files in " + libraries_result.path);
 				const walk_results = await globPromise(libraries_result.path);
 
 				for (let i = 0; i < walk_results.length; i++) {
@@ -69,13 +68,7 @@ function resyncLibraries(db, event, what_lib) {
 					try {
 						file_data = await mm.parseFile(walk_results[i])
 					} catch (e) {
-						event.sender.send("ui_notify", {
-							type: "error",
-							title: "An unexpected error has occured:",
-							text: "Failed gathering metadata about file: " + walk_results[i],
-							collapse_title: "Stacktrace",
-							collapse: e.stack || e.toString()
-						});
+						sendNotification(event,e,null);
 						continue;
 					}
 
@@ -85,7 +78,7 @@ function resyncLibraries(db, event, what_lib) {
 						!file_data.common.hasOwnProperty("artist") || file_data.common.artist === "" || file_data.common.artist === null ||
 						!file_data.common.track.hasOwnProperty("no")
 					) {
-						event.sender.send("ui_notify", {
+						sendNotification(event,null,{
 							type: "error",
 							title: "Failed to parse a file:",
 							text: walk_results[i] + " is missing on of those fileds in his tags: artist/album/title/track_no",
@@ -96,11 +89,12 @@ function resyncLibraries(db, event, what_lib) {
 					if(!new_books.hasOwnProperty(file_data.common.album)) {
 						const unique_book_id = await md5(file_data.common.album)
 						if(book_ids.includes(unique_book_id)) {
-							event.sender.send("ui_notify", {
+							if(!notification_already_sent_for.includes(unique_book_id)) sendNotification(event,null,{
 								type: "warn",
 								title:"Duplicate book found",
 								text: "Found multiple entries for: "+file_data.common.album,
 							});
+							notification_already_sent_for.push(unique_book_id)
 							continue
 						}
 						new_books[file_data.common.album] = {
@@ -114,20 +108,19 @@ function resyncLibraries(db, event, what_lib) {
 
 					const unique_chapter_id = await md5(file_data.common.album+"_"+file_data.common.title)
 					if(chapter_ids.includes(unique_chapter_id)) {
-						event.sender.send("ui_notify", {
+						if(!notification_already_sent_for.includes(unique_chapter_id)) sendNotification(event,null,{
 							type: "warn",
 							title:"Duplicate chapter found",
 							text: "Found multiple entries for: "+file_data.common.album+" / "+file_data.common.title,
 							collapse_title: "Details:",
 							collapse: "File path:" + walk_results[i]
 						});
+						notification_already_sent_for.push(unique_chapter_id)
 						continue;
 					}
 					chapter_ids.push(unique_chapter_id)
 
 					new_books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
-
-
 					new_books[file_data.common.album].chapters.push({
 						unique_hash: unique_chapter_id,
 						file_path: walk_results[i],
@@ -137,8 +130,7 @@ function resyncLibraries(db, event, what_lib) {
 						chapter_duration: file_data.format.duration ? file_data.format.duration : 0
 					})
 
-					event.sender.send("library_load_text", "Parsing file "+i+" out of "+walk_results.length);
-
+					updateLoadingScreenText(event, "Parsing file "+i+" out of "+walk_results.length);
 				}
 
 
@@ -151,34 +143,26 @@ function resyncLibraries(db, event, what_lib) {
 					let b = books_organized[i]
 					b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
 					b.libraryId = libraries_result.id
-					db.models.Book.create(b, {
+					await db.models.Book.create(b, {
 						include: [ db.models.Book.chapters ]
 					}).catch((err)=>{
-
-						event.sender.send("ui_notify", {
-							type: "error",
-							title: "An unexpected error has occured:",
-							text: "Failed saving book to database: " + b.name,
-							collapse_title: "Stacktrace",
-							collapse: err.stack || err.toString()
-						});
-
+						sendNotification(event,err,null)
 					});
-					event.sender.send("library_load_text", "Saving book "+i+" out of "+books_organized.length);
+					updateLoadingScreenText(event, "Saving book "+(i+1)+" out of "+books_organized.length);
 
 				}
 			}
 
-			await reloadLibrary(db, event)
-			resolve();
-
+			reloadLibraries(db, event).then((b)=>{
+				resolve(b);
+				console.log(b.map(x=>{return x.name}))
+			})
 		}).catch(reject);
 	});
 }
-function reloadLibrary(db, event) {
+function reloadLibraries(db, event) {
 	return new Promise(function(resolve, reject) {
 		db.models.Book.findAll({ include: db.models.Chapter }).then(async (results)=> {
-			event.sender.send("library_load", "start");
 
 			// Remap it correctly
 			results = results.map(book => {
@@ -202,35 +186,99 @@ function reloadLibrary(db, event) {
 
 			for (let i = 0; i < results.length; i++) results[i].chapters.sort(function (a, b) { return a.chapter_no - b.chapter_no; });
 
-			event.sender.send("library_load", "stop");
-			event.sender.send("library_update", results);
 			resolve(results);
 
 		}).catch(reject);
-
 	})
+}
+function getLibraries(db, event) {
+	return new Promise(function(resolve, reject) {
+		db.models.Library.findAll({ include: db.models.Book }).then(async (results)=> {
 
+			// Remap it correctly
+			results = results.map(lib => {
+				return {
+					id: lib.id,
+					path: lib.path,
+					books: lib.books,
+				}
+			});
+
+			resolve(results);
+		}).catch(reject);
+	})
+}
+
+function startLoadingScreen(event) {
+	event.sender.send("loading");
+}
+function updateLoadingScreenText(event, txt) {
+	event.sender.send("library_load_text", txt ? txt : "");
+}
+function endLoadingScreen(event, err, notification) {
+	event.sender.send("end_loading");
+	sendNotification(event,err,notification)
+}
+function sendNotification(event, err, notification) {
+	if(err) {
+		console.error(err)
+		event.sender.send("ui_notify", {
+			type: "error",
+			title: "An unexpected error has occured:",
+			text: "",
+			collapse_title: "Stacktrace",
+			collapse: err.stack || err.toString()
+		});
+	}
+	if(notification) {
+		event.sender.send("ui_notify",notification);
+	}
 }
 
 function controller(db) {
-	ipcMain.on("force_reload",function (event, arg) {
-		event.sender.send("loading", "loading");
-		reloadLibrary(db, event).then(function () {
-			event.sender.send("end_loading", "Reload finished");
+	ipcMain.on("get_libraries",function (event, arg) {
+		getLibraries(db, event).then(function (l) {
+			event.sender.send("libraries_update", l);
+		}).catch(function (err) {
+			sendNotification(event,err,null);
+		});
+	});
+	ipcMain.on("delete_library",async function (event, arg) {
+		startLoadingScreen(event);
+		await db.models.Library.destroy({ where: { path: arg.path } })
+
+		getLibraries(db, event).then(function (l) {
+			event.sender.send("libraries_update", l);
+
+			//Null is used here cause if we have a duplicate it won't rescan it otherwise
+			resyncLibraries(db, event, null).then(function (books) {
+				endLoadingScreen(event,null,null);
+			}).catch(function (err) {
+				endLoadingScreen(event,err,null);
+			});
 
 		}).catch(function (err) {
-			console.error(err)
-			event.sender.send("end_loading", "Error while reloading: "+err);
+			endLoadingScreen(event,err,null);
 		});
 	});
 
-	ipcMain.on("force_resync",function (event, arg) {
-		event.sender.send("loading", "loading");
-		resyncLibraries(db, event, arg).then(function (books) {
-			event.sender.send("end_loading", "Sync finished");
+	ipcMain.on("force_reload",function (event, arg) {
+		startLoadingScreen(event);
+		reloadLibraries(db, event).then(function (books) {
+			event.sender.send("library_update", books);
+			endLoadingScreen(event)
 		}).catch(function (err) {
-			console.error(err)
-			event.sender.send("end_loading", "Error while syncing: "+err);
+			endLoadingScreen(event,err,null);
+		});
+	});
+	ipcMain.on("force_resync",function (event, arg) {
+		console.log("RESYBC ENDED WTH A FUCKING ERROR")
+		startLoadingScreen(event);
+		resyncLibraries(db, event, arg).then(function (books) {
+			event.sender.send("library_update", books);
+			endLoadingScreen(event)
+		}).catch(function (err) {
+			endLoadingScreen(event,err,null);
 		});
 	});
 
@@ -240,30 +288,34 @@ function controller(db) {
 			if(r.canceled === true) return;
 			if(r.filePaths.length !== 1) return;
 
-			event.sender.send("loading", "loading");
+			startLoadingScreen(event);
 
 			db.models.Library.sync().then(() => {
 				db.models.Library.create({
 					path: r.filePaths[0],
 					books: []
 				}).then(function (new_lib) {
+					updateLoadingScreenText(event, "Starting to sync the new library");
 
-					event.sender.send("library_load_text", "Starting to sync the new library");
-
-					resyncLibraries(db, event, new_lib).then(function () {
-						event.sender.send("end_loading", "Sync finished");
+					resyncLibraries(db, event, new_lib).then(function (books) {
+						event.sender.send("library_update", books);
+						endLoadingScreen(event)
 					}).catch(function (err) {
-						console.error(err)
-						event.sender.send("end_loading", "Error while syncing: "+err);
+						endLoadingScreen(event,err,null);
 					})
 
+					getLibraries(db, event).then(function (l) {
+						event.sender.send("libraries_update", l);
+					}).catch(function (err) {
+						endLoadingScreen(event,err,null);
+					});
+
 				}).catch(function () {
-					event.sender.send("ui_notify", {
+					endLoadingScreen(event,null,{
 						type: "warn",
 						title:"This library already exist.",
 						text: "You can go to the settings to reload it.",
 					});
-					event.sender.send("end_loading", "Sync finished");
 				});
 			});
 
