@@ -235,7 +235,7 @@ function sendNotification(event, err, notification) {
 	}
 }
 
-function controller(db) {
+function controller(db, config) {
 	ipcMain.on("get_libraries",function (event, arg) {
 		getLibraries(db, event).then(function (l) {
 			event.sender.send("libraries_update", l);

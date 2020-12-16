@@ -32,12 +32,19 @@ const db = {
 		Chapter: require("./db_models/Chapter.js")(sequelize, Sequelize.DataTypes),
 		Book:    require("./db_models/Book.js")(sequelize, Sequelize.DataTypes),
 		Library: require("./db_models/Library.js")(sequelize, Sequelize.DataTypes),
+		Config:  require("./db_models/Config.js")(sequelize, Sequelize.DataTypes),
 	},
 	sequelize: sequelize
 }
 
+const {Config} = require("./config")
 
-sequelize.sync({ force: true })
+const config = new Config(db);
+(async () => {
+	await sequelize.sync({ force: true })
+	await config.init()
+})();
+
 
 require("./controllers/library").controller(db)
 require("./controllers/audio").controller(db)

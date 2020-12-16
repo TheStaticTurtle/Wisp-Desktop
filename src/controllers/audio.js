@@ -10,7 +10,7 @@ function findIndex(arr, cond) {
 	}
 }
 
-function controller(db) {
+function controller(db, config) {
 	const t = {
 		current_book: null,
 		current_chapter_index: 0,
