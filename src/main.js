@@ -4,6 +4,7 @@ import App from './App.vue'
 
 import 'jquery'
 import 'bootstrap'
+import 'bootstrap-toggle'
 import 'popper.js'
 import 'bootstrap/dist/css/bootstrap.min.css'
 

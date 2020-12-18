@@ -23,6 +23,7 @@
     "@types/node": "^14.14.12",
     "bookshelf": "^1.2.0",
     "bootstrap": "^4.5.3",
+    "bootstrap-toggle": "^2.2.2",
     "core-js": "^3.8.1",
     "dataurl": "^0.1.0",
     "debug": "^4.3.1",
