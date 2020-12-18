@@ -11,29 +11,26 @@ export class Config {
 	}
 
 	async init() {
-		const lines_in_config = await this.db.models.Config.findAll()
-		this.db_config = Object.fromEntries( lines_in_config.map(x => { return [x.key, x] }) );
-
-		const default_config_keys = Object.keys(config_default);
-		const db_config_keys = Object.keys(this.db_config);
+		let lines_in_config = await this.db.models.Config.findAll()
+		this.db_config = Object.fromEntries( lines_in_config.map(x => { return [x.key, x]; }) );
 
 		//Create keys that don't exist
-		for (let i = 0; i < default_config_keys.length; i++) {
-			if(!db_config_keys.includes(default_config_keys[i])) {
-				await this.db.models.Config.create({ "key": default_config_keys[i], "value": config_default[default_config_keys[i]] }).catch(console.error);
-				this.db_config[db_config_keys[i]] = config_default[default_config_keys[i]]
+		for (const key in config_default) {
+			if(!this.db_config.hasOwnProperty(key)) {
+				this.db_config[key] = await this.db.models.Config.create({ "key": key, "value": config_default[key] }).catch(console.error);
 			}
 		}
 
 		//Delete keys that aren't in the default config
-		for (let i = 0; i < db_config_keys.length; i++) {
-			if(!default_config_keys.includes(db_config_keys[i])) {
-				await this.db.models.Config.destroy({where: {key: db_config_keys[i]}})
-				delete this.db_config[db_config_keys[i]]
+		for (const key in this.db_config) {
+			if(!config_default.hasOwnProperty(key)) {
+				await this.db.models.Config.destroy({where: {key: key}})
+				delete this.db_config[key]
 			}
 		}
 
-		this.config = this.db_config
+		lines_in_config = await this.db.models.Config.findAll()
+		this.db_config = Object.fromEntries( lines_in_config.map(x => { return [x.key, x]; }) );
 	}
 
 	force_sync() {
@@ -48,17 +45,21 @@ export class Config {
 		})
 	}
 
-	set(key, value) {
-		const t = this
-		return new Promise(async function(resolve, reject) {
-			if(!t.db_config.hasOwnProperty(key)) reject(new Error("Invalid key"));
-			t.db_config[key].value = value
-			t.db_config[key].save().then(resolve).catch(reject)
-		})
+	async set(key, value) {
+		this.db_config[key].value = value;
+		await this.db_config[key].save()
 	}
 
 	get(key) {
 		if(!this.db_config.hasOwnProperty(key)) throw new Error("Invalid key");
 		return this.db_config[key].value;
+	}
+
+	get_all_mapped() {
+		let ret = {}
+		for (const dbConfigKey in this.db_config) {
+			ret[dbConfigKey] = this.db_config[dbConfigKey].value
+		}
+		return ret
 	}
 }

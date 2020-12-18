@@ -46,8 +46,9 @@ const config = new Config(db);
 })();
 
 
-require("./controllers/library").controller(db)
-require("./controllers/audio").controller(db)
+require("./controllers/library").controller(db,config)
+require("./controllers/audio").controller(db,config)
+require("./controllers/config").controller(db,config)
 
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'app', privileges: { secure: true, standard: true } }
