@@ -41,7 +41,7 @@
 					<li><a @click="playBook(data.id)">Play</a></li>
 					<li><a @click="libraryBookClick(data.id)">Display</a></li>
 					<hr>
-					<li><a>Hide from library</a></li>
+					<li><a @click="addBookToHidden(data)">Hide from library</a></li>
 				</template>
 			</VueContext>
 
@@ -108,6 +108,11 @@
 			},
 			libraryBookClick(arg) {
 				this.$emit('libraryBookClick', arg)
+			},
+			addBookToHidden(arg) {
+				this.$electron.ipcRenderer.send("add_hidden_file",
+					arg.book.chapters.map(c => { return c.file_path })
+				);
 			},
 			add_library() {
 				this.$electron.ipcRenderer.send("add_new_library", "open_please");

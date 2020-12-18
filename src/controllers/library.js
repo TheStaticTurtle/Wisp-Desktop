@@ -5,6 +5,7 @@ const fs = require('fs');
 const mm = require('music-metadata');
 const dataurl = require('dataurl');
 const md5 = require('md5');
+const pathEqual = require("path-equal").pathEqual
 
 const ALLOWED_EXTS = [".wav",".mp3",".ogg",".webm",".flac",".aac"];
 
@@ -39,6 +40,9 @@ function resyncLibraries(db, event, what_lib) {
 		const path_to_resync = what_lib === null ? null : (what_lib instanceof Object ? what_lib.path : what_lib)
 		const search_promise = path_to_resync === undefined || path_to_resync === null ? db.models.Library.findAll() : db.models.Library.findAll({where: { path: path_to_resync }})
 
+		let hidden_files = await getHiddenFiles(db,event)
+		hidden_files = hidden_files.map(x => { return x.path })
+
 		//Avoid spamming notifications for stupid reasons
 		let notification_already_sent_for = []
 
@@ -55,7 +59,14 @@ function resyncLibraries(db, event, what_lib) {
 				let new_books = {}
 
 				updateLoadingScreenText(event, "Listing files in " + libraries_result.path);
-				const walk_results = await globPromise(libraries_result.path);
+				let walk_results = await globPromise(libraries_result.path);
+
+				walk_results = walk_results.filter(el => {
+					for (const hidden_file of hidden_files) {
+						if(pathEqual(hidden_file,el)) return false
+					}
+					return true
+				})
 
 				for (let i = 0; i < walk_results.length; i++) {
 					let file_data = null;
@@ -208,6 +219,7 @@ function getLibraries(db, event) {
 		}).catch(reject);
 	})
 }
+
 function getHiddenFiles(db, event) {
 	return new Promise(function(resolve, reject) {
 		db.models.HiddenFiles.findAll().then(async (results)=> {
@@ -220,6 +232,21 @@ function getHiddenFiles(db, event) {
 			resolve(results);
 		}).catch(reject);
 	})
+}
+function addHiddenFiles(db, event ,paths) {
+	return new Promise(function(resolve, reject) {
+		let promiseArr = []
+		for (const path of paths) {
+			promiseArr.push(
+				db.models.HiddenFiles.create({
+					path: path,
+				})
+			)
+			Promise.all(promiseArr).then(data => {
+				getHiddenFiles(db,event).then(resolve).catch(reject)
+			}).catch(reject)
+		}
+	});
 }
 
 function startLoadingScreen(event) {
@@ -256,13 +283,6 @@ function controller(db, config) {
 			sendNotification(event,err,null);
 		});
 	});
-	ipcMain.on("get_hidden_files",function (event, arg) {
-		getHiddenFiles(db, event).then(function (l) {
-			event.sender.send("hidden_files_update", l);
-		}).catch(function (err) {
-			sendNotification(event,err,null);
-		});
-	});
 	ipcMain.on("delete_library",async function (event, arg) {
 		startLoadingScreen(event);
 		await db.models.Library.destroy({ where: { path: arg.path } })
@@ -292,7 +312,6 @@ function controller(db, config) {
 		});
 	});
 	ipcMain.on("force_resync",function (event, arg) {
-		console.log("RESYBC ENDED WTH A FUCKING ERROR")
 		startLoadingScreen(event);
 		resyncLibraries(db, event, arg).then(function (books) {
 			event.sender.send("library_update", books);
@@ -340,6 +359,31 @@ function controller(db, config) {
 			});
 
 		})
+	});
+
+	ipcMain.on("get_hidden_files",function (event, arg) {
+		getHiddenFiles(db, event).then(function (l) {
+			event.sender.send("hidden_files_update", l);
+		}).catch(function (err) {
+			sendNotification(event,err,null);
+		});
+	});
+	ipcMain.on("add_hidden_file",function (event, arg) {
+		const f = arg instanceof Array ? arg : (arg instanceof Object ? [arg.path] : [arg])
+		addHiddenFiles(db, event, f).then(function (new_hidden_files) {
+			event.sender.send("hidden_files_update", new_hidden_files);
+
+			startLoadingScreen(event);
+			resyncLibraries(db, event, arg).then(function (books) {
+				event.sender.send("library_update", books);
+				endLoadingScreen(event)
+			}).catch(function (err) {
+				endLoadingScreen(event,err,null);
+			});
+
+		}).catch(function (err) {
+			sendNotification(event,err,null);
+		});
 	});
 }
 
