@@ -11,6 +11,7 @@
 				style="margin: -15px; padding: 15px 0; width: calc(100% + 30px);"
 				:display_player_related="enable_controls"
 				:player="player" @navigationClick="navigationClick"
+				:config="config"
 		></PlayerNavigation>
 
 		<AppSettings
@@ -36,6 +37,7 @@
 			<PlayerControls
 					:enable_controls="enable_controls"
 					:player="player"
+					:config="config"
 					@playerControl="playerControlCB"
 					@VSUpdate="playerVSUpdate"
 					@PositionUpdate="playerPositionUpdate"
@@ -72,6 +74,7 @@
 
 				libraries: [],
 				books: [],
+				config: {},
 
 				player: {
 					image_url: "",
@@ -173,7 +176,7 @@
 
 			handler_chapter_end() {
 				//console.log(this)
-				if(this.player.file_sound_next !== "") {
+				if(this.player.file_sound_next !== "" && this.config.auto_continue_chapter) {
 					this.$electron.ipcRenderer.send("player_control_request", "next")
 				}
 			},
@@ -266,6 +269,12 @@
 
 			this.$electron.ipcRenderer.send("force_reload");
 			this.$electron.ipcRenderer.send("get_libraries");
+			this.$electron.ipcRenderer.send("config_get");
+
+			this.$electron.ipcRenderer.on('config_update', (e, data) => {
+				t.config = data
+				console.log("config_update")
+			})
 
 			this.$electron.ipcRenderer.on('player_chapter_update', (e, data) => {
 				console.log(data)

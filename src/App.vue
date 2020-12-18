@@ -25,18 +25,17 @@
 	@import './assets/fonts/simple-line-icons.min.css';
 	@import './assets/css/Slider-Range.css';
 	@import './assets/css/styles.css';
+	@import './assets/css/bootstrap4-toggle.min.css';
 </style>
 
 
 <script>
+	window.jQuery = window.$ = require('jquery');
+
 	import Player from './components/Player.vue'
 	import Notifications from "./components/Notifications";
-	window.jQuery = window.$ = require('jquery');
 	/*if (process.env.NODE_ENV !== 'development') */window.__static = require('path').join(__dirname, '/assets').replace(/\\/g, '\\\\')
 
-	window.$(function () {
-		window.$('[data-toggle="popover"]').popover()
-	})
 
 	export default {
 		name: 'WhisperBook',

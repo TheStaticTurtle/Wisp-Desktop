@@ -32,8 +32,16 @@
 		</ul>
 
 		<div class="tab-content" id="pills-tabContent">
-			<div class="tab-pane fade show active" id="settings-general" role="tabpanel" aria-labelledby="nav-settings-general">
-				....
+			<div class="tab-pane fade show active container-fluid" id="settings-general" role="tabpanel" aria-labelledby="nav-settings-general">
+				<div class="row">
+					<div class="col-6">
+						<label for="auto_continue_chapter_check" class="form-check-label">Auto continue chapters</label>
+					</div>
+					<div class="col">
+						<bootstrap-toggle v-model="config.auto_continue_chapter" id="auto_continue_chapter_check" :options="{ on: 'Continue', off: 'Pause', onstyle: 'outline-success', offstyle: 'outline-warning', size: 'small'}" :disabled="false" />
+					</div>
+				</div>
+
 			</div>
 			<div class="tab-pane fade" id="settings-libs" role="tabpanel" aria-labelledby="nav-settings-libs">
 
@@ -85,21 +93,37 @@
 </template>
 
 <script>
+	import BootstrapToggle from './utils/BootstrapToogle'
+
 	export default {
-		name: "AppLibraries",
-		components: {  },
+		name: "AppSettings",
+		components: { BootstrapToggle },
 		props: {
 			libraries: Array,
 		},
 		mounted() {
+			const t = this;
+			this.$electron.ipcRenderer.send("config_get");
+
+			this.$electron.ipcRenderer.on('config_update', (e, data) => {
+				t.config = data
+			})
+
+			window.$('#auto_continue_chapter_check').bootstrapToggle();
 		},
 		data() {
 			return {
 				modal_text: "",
-				delete_library_selected: null
+				delete_library_selected: null,
+				config: {
+					auto_continue_chapter: true,
+				}
 			}
 		},
 		watch: {
+			'config.auto_continue_chapter':  function (){
+				this.$electron.ipcRenderer.send("config_set", { key: "auto_continue_chapter", value: this.config.auto_continue_chapter })
+			},
 		},
 		methods: {
 			resync_library(lib) {
