@@ -17,7 +17,6 @@
 		<AppSettings
 				style="padding: 0 0; "
 				v-if="current_view==='LIBRARIES' && !is_loading"
-				:libraries="libraries"
 				@navigationClick="navigationClick"
 		></AppSettings>
 

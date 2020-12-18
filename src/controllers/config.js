@@ -2,7 +2,6 @@ const { ipcMain } = require('electron')
 
 function controller(db, config) {
 	ipcMain.on("config_get",function (event, arg) {
-		console.log(config.get_all_mapped())
 		event.sender.send("config_update", config.get_all_mapped());
 	});
 

@@ -29,6 +29,11 @@
 					<h2 class="m-0 p-1 pl-3 pr-3">Libraries</h2>
 				</a>
 			</li>
+			<li class="nav-item" role="presentation">
+				<a class="no-underline text-light app-nav" id="nav-settings-hiddenfiles" data-toggle="pill" href="#settings-hiddenfiles" role="tab" aria-controls="settings-libs" aria-selected="false">
+					<h2 class="m-0 p-1 pl-3 pr-3">Hidden files</h2>
+				</a>
+			</li>
 		</ul>
 
 		<div class="tab-content" id="pills-tabContent">
@@ -59,6 +64,26 @@
 							<a class="no-underline text-light p-2" href="#" title="More options"><i class="icon-options"></i></a>
 							<a @click="resync_library(library)" class="no-underline text-light p-2 " href="#" title="Rescan this library"><i class="icon-refresh"></i></a>
 							<a @click="delete_library(library)" class="no-underline text-danger p-2" data-toggle="modal" data-target="#confirmModal" title="Delete this library"><i class="icon-trash"></i></a>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+
+			</div>
+			<div class="tab-pane fade" id="settings-hiddenfiles" role="tabpanel" aria-labelledby="nav-settings-hiddenfiles">
+
+				<table class="table table-hover">
+					<thead class="text-light">
+					<tr class="custom_tr_head">
+						<th>Path</th>
+						<th class="text-nowrap text-center" style="width: 1%;"><i class="icon-wrench"></i></th>
+					</tr>
+					</thead>
+					<tbody class="text-light">
+					<tr v-for="(hidden_file) in hidden_files" v-bind:key="hidden_file.id">
+						<td>{{ hidden_file.path }}</td>
+						<td>
+							<a @click="delete_hidden_file(hidden_file)" class="no-underline text-danger p-2" data-toggle="modal" data-target="#confirmModal" title="Re-show this file"><i class="icon-trash"></i></a>
 						</td>
 					</tr>
 					</tbody>
@@ -99,14 +124,25 @@
 		name: "AppSettings",
 		components: { BootstrapToggle },
 		props: {
-			libraries: Array,
 		},
 		mounted() {
 			const t = this;
+
+			this.$electron.ipcRenderer.send("get_libraries");
+			this.$electron.ipcRenderer.send("get_hidden_files");
 			this.$electron.ipcRenderer.send("config_get");
 
 			this.$electron.ipcRenderer.on('config_update', (e, data) => {
 				t.config = data
+				console.log("config_update")
+			})
+			this.$electron.ipcRenderer.on('libraries_update', (event, arg) => {
+				t.libraries = arg
+				console.log("libraries_update")
+			})
+			this.$electron.ipcRenderer.on('hidden_files_update', (e, data) => {
+				t.hidden_files = data
+				console.log("hidden_files_update")
 			})
 
 			window.$('#auto_continue_chapter_check').bootstrapToggle();
@@ -115,6 +151,8 @@
 			return {
 				modal_text: "",
 				delete_library_selected: null,
+				libraries: [],
+				hidden_files: [],
 				config: {
 					auto_continue_chapter: true,
 				}
@@ -126,6 +164,9 @@
 			},
 		},
 		methods: {
+			delete_hidden_file(hidden_file) {
+				console.log(hidden_file)
+			},
 			resync_library(lib) {
 				this.$electron.ipcRenderer.send("force_resync", lib)
 			},

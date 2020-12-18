@@ -33,6 +33,7 @@ const db = {
 		Book:    require("./db_models/Book.js")(sequelize, Sequelize.DataTypes),
 		Library: require("./db_models/Library.js")(sequelize, Sequelize.DataTypes),
 		Config:  require("./db_models/Config.js")(sequelize, Sequelize.DataTypes),
+		HiddenFiles: require("./db_models/HiddenFiles.js")(sequelize, Sequelize.DataTypes),
 	},
 	sequelize: sequelize
 }

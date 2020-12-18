@@ -208,6 +208,19 @@ function getLibraries(db, event) {
 		}).catch(reject);
 	})
 }
+function getHiddenFiles(db, event) {
+	return new Promise(function(resolve, reject) {
+		db.models.HiddenFiles.findAll().then(async (results)=> {
+			results = results.map(lib => {
+				return {
+					id: lib.id,
+					path: lib.path,
+				}
+			});
+			resolve(results);
+		}).catch(reject);
+	})
+}
 
 function startLoadingScreen(event) {
 	event.sender.send("loading");
@@ -239,6 +252,13 @@ function controller(db, config) {
 	ipcMain.on("get_libraries",function (event, arg) {
 		getLibraries(db, event).then(function (l) {
 			event.sender.send("libraries_update", l);
+		}).catch(function (err) {
+			sendNotification(event,err,null);
+		});
+	});
+	ipcMain.on("get_hidden_files",function (event, arg) {
+		getHiddenFiles(db, event).then(function (l) {
+			event.sender.send("hidden_files_update", l);
 		}).catch(function (err) {
 			sendNotification(event,err,null);
 		});
