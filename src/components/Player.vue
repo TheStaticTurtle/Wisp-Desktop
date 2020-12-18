@@ -24,7 +24,7 @@
 			<!--TODO: CF toto ln 4 -->
 			<PlayerNavigation class="d-none d-sm-flex" :display_player_related="enable_controls" :player="player" @navigationClick="navigationClick"></PlayerNavigation>
 
-			<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick"></PlayerLibrary>
+			<PlayerLibrary class="" v-if="current_view === 'LIBRARY'" :books="books" @libraryBookClick="libraryBookClick" @libraryBookPlay="libraryBookPlay"></PlayerLibrary>
 			<PlayerBook  v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 		</div>
 
@@ -108,6 +108,9 @@
 			libraryBookClick(arg) {
 				this.book_view_display_which_book = this.books[Math.max(Math.min(arg,this.books.length-1),0)];
 				this.current_view = 'BOOK'
+			},
+			libraryBookPlay(arg) {
+				this.$electron.ipcRenderer.send("player_read_new_book_request", this.books[Math.max(Math.min(arg,this.books.length-1),0)]);
 			},
 			navigationClick(arg) {
 				switch (arg) {

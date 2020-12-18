@@ -16,7 +16,7 @@
 
 			<div
 					v-for="(book,index) in actual_books" :key="book.id"
-					@contextmenu.prevent="$refs.menu.open($event, { book: book.unique_hash })"
+					@contextmenu.prevent="$refs.menu.open($event, { book: book, id: index })"
 					class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start"
 					style="padding: 5px;">
 				<LibraryItem  :book="book" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
@@ -36,14 +36,12 @@
 				</button>
 			</div>
 
-			<VueContext ref="menu" v-slot="{ data }" class="bg-dark">
+			<VueContext ref="menu" v-slot="{ data }" class="bg-dark context-menu">
 				<template v-if="data">
-					<li>{{ data.book }}</li>
-					<li>
-						<a>
-							Option 1
-						</a>
-					</li>
+					<li><a @click="playBook(data.id)">Play</a></li>
+					<li><a @click="libraryBookClick(data.id)">Display</a></li>
+					<hr>
+					<li><a>Hide from library</a></li>
 				</template>
 			</VueContext>
 
@@ -105,6 +103,9 @@
 				}
 				this.actual_books = await this.search_index.search(arg)
 			},
+			playBook(arg) {
+				this.$emit('libraryBookPlay', arg)
+			},
 			libraryBookClick(arg) {
 				this.$emit('libraryBookClick', arg)
 			},
@@ -117,4 +118,5 @@
 
 <style scoped>
 	@import '~vue-context/dist/css/vue-context.css';
+	@import "../assets/css/context_menu.css";
 </style>

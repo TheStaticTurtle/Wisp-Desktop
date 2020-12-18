@@ -1,0 +1,28 @@
+
+.context-menu {
+	padding: 5px 0px;
+	color: lightgrey;
+	border-radius: 0px;
+	box-shadow: none;
+}
+
+.context-menu > li {
+	margin: 2px 0px;
+	cursor: pointer;
+}
+.context-menu > li:hover {
+	color: white;
+}
+
+.context-menu > li a {
+	padding: 5px 15px;
+}
+.context-menu > li a:hover {
+	background-color: #252525;
+}
+
+
+.context-menu > hr {
+	margin: 8px 5px;
+	background-color: lightgrey;
+}
