@@ -1,5 +1,5 @@
 <template>
-	<div class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start" style="padding: 5px;">
+	<!--<div class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start" style="padding: 5px;">-->
 		<button @click="click" class="btn btn-primary" type="button" style="padding: 1px; width: 100%">
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
@@ -12,7 +12,7 @@
 				</div>
 			</div>
 		</button>
-	</div>
+	<!--</div>-->
 </template>
 
 <script>
@@ -20,6 +20,7 @@
 
 	export default {
 		name: "LibraryItem",
+		components: {  },
 		props: {
 			book: Object,
 			id: Number,
@@ -46,5 +47,4 @@
 </script>
 
 <style scoped>
-
 </style>

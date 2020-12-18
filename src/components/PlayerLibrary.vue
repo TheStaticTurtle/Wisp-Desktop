@@ -14,7 +14,13 @@
 		</div>
 		<div class="row d-flex flex-grow-1" style="overflow-y: auto;height: 1px;margin-bottom: 15px;">
 
-			<LibraryItem v-for="(book,index) in actual_books" :key="book.id" :book="book" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
+			<div
+					v-for="(book,index) in actual_books" :key="book.id"
+					@contextmenu.prevent="$refs.menu.open($event, { book: book.unique_hash })"
+					class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start"
+					style="padding: 5px;">
+				<LibraryItem  :book="book" :id="index" @libraryBookClick="libraryBookClick"></LibraryItem>
+			</div>
 
 			<div class="col-sm-3 col-md-2 col-lg-2 col-xl-2 offset-xl-0 align-self-start" style="padding: 5px;">
 				<button @click="add_library" id="add_new_library" class="btn btn-warning" type="button" style="padding: 1px;">
@@ -30,18 +36,30 @@
 				</button>
 			</div>
 
+			<VueContext ref="menu" v-slot="{ data }" class="bg-dark">
+				<template v-if="data">
+					<li>{{ data.book }}</li>
+					<li>
+						<a>
+							Option 1
+						</a>
+					</li>
+				</template>
+			</VueContext>
+
 		</div>
+
 	</div>
 </template>
 
 <script>
 	import LibraryItem from "./LibraryItem";
 	const FlexSearch = require("flexsearch");
-
+	import VueContext from 'vue-context';
 
 	export default {
 		name: "PlayerLibrary",
-		components: { LibraryItem },
+		components: { LibraryItem, VueContext },
 		props: {
 			books: Array,
 		},
@@ -98,5 +116,5 @@
 </script>
 
 <style scoped>
-
+	@import '~vue-context/dist/css/vue-context.css';
 </style>
