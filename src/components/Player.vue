@@ -28,7 +28,7 @@
 			<PlayerBook  v-if="current_view === 'BOOK'" :player_data="player" :book="book_view_display_which_book" @chapterPlayPause="chapterPlayPauseCtls"></PlayerBook>
 		</div>
 
-		<div v-if="is_loading"  class="col-md-12 col-lg-12 col-xl-12 offset-xl-0 d-flex flex-column visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
+		<div v-if="is_loading"  class="offset-xl-0 row d-flex flex-grow-1 visible" style="padding-top: 25px;padding-left: 24px;padding-right: 24px;">
 			<Loading v-bind:text="loading_text"></Loading>
 		</div>
 

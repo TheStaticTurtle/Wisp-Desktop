@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid text-light d-flex flex-column justify-content-center align-items-center" style="height: 100%;">
+	<div class="container-fluid text-light d-flex flex-column justify-content-center align-items-center">
 		<div class="row no-gutters bounce animated infinite">
 			<div class="col d-flex justify-content-center align-items-center">
 				<div class="rubberBand animated infinite" style="width: 201px;height: 201px;border-radius: 50%;border-width: 4px;border-style: solid;position: relative;"></div>
