@@ -71,8 +71,9 @@
 					<span class="">Volume: {{range_volume_control}}%</span>
 				</div>
 				<div class="col col-lg-12 d-flex align-items-center" style="font-size: 20px;text-align: center;">
-					<a class="text-light" href="#" style="padding-right: 20px;">
-						<i class="fa fa-volume-up"></i>
+					<a class="text-light no-underline" @click="toggle_mute" href="#" style="padding-right: 20px;">
+						<i v-if="!is_muted" class="icon-volume-2"></i>
+						<i v-if="is_muted" class="icon-volume-off"></i>
 					</a>
 					<input @dblclick="range_volume_control = 85" v-model="range_volume_control" class="slider slider-thumb-red" type="range" id="myRange" min="0" max="100"  style="height: 4px;">
 				</div>
@@ -111,6 +112,12 @@
 			},
 		},
 		methods: {
+			toggle_mute() {
+				if(this.is_muted)
+					this.range_volume_control = this.old_range_volume_control;
+				else
+					this.range_volume_control = 0;
+			},
 			gotoBook() {
 				this.$emit("GotoCurrentBook", {})
 			},
@@ -128,6 +135,8 @@
 			},
 			range_volume_control(chg) {
 				this.processed_volume = chg / 100.0;
+				this.is_muted = chg === 0
+				if(chg !== 0) this.old_range_volume_control = chg
 				this.emitValues();
 			},
 			player: {
@@ -149,6 +158,7 @@
 		},
 		data() {
 			return {
+				is_muted: false,
 				is_draging: false,
 
 				drag_progress: 50,
@@ -157,6 +167,7 @@
 
 				range_speed_control: 100,
 				range_volume_control: 85,
+				old_range_volume_control: 85,
 				processed_speed: 1,
 				processed_volume: 1,
 			}
