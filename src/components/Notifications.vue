@@ -10,11 +10,11 @@
 
 				<div
 						v-for="(notification,index) in notifications"
-						v-bind:key="index"
+						v-bind:key="notification"
 						v-bind:class="{'alert-danger':notification.type==='error', 'alert-info':notification.type==='info', 'alert-warning':notification.type==='warn' }"
 						class="alert"
 						role="alert">
-					<button @click="remove(index)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+					<button @click="remove(notification)" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
 					<span><strong>{{ notification.title }}</strong></span>
 					<p style="font-size: 13px;margin-bottom: 0px;">{{ notification.text }}</p>
 					<div v-if="notification.collapse !== undefined">
@@ -41,8 +41,8 @@
 			clearAll() {
 				this.notifications= []
 			},
-			remove(index) {
-				this.notifications.splice(index, 1);
+			remove(click_notification) {
+				this.notifications = this.notifications.filter(x => { return x !== click_notification})
 			}
 		},
 		mounted() {
