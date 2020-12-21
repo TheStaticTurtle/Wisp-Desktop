@@ -57,9 +57,6 @@
 	export default {
 		name: 'Player',
 		components: {AppSettings, PlayerBook, Loading, PlayerNavigation, PlayerLibrary, PlayerControls},
-		/*props: {
-          msg: String
-        }*/
 		data() {
 			return {
 				current_view: 'LIBRARY',
@@ -134,16 +131,14 @@
 			},
 
 			send_player_status_over_ipc() {
-
 				this.$electron.ipcRenderer.send("player_update", {
 					playing: this.player.playing,
-					chapter_uh: this.player.chapter_uh,
+					book: this.player.book,
+					chapter: this.player.chapter,
 					current_file_position: this.player.current_file_position,
 					current_file_duration: this.player.current_file_duration,
 					current_volume: this.player.current_volume,
 					current_speed: this.player.current_speed,
-					file_sound_current: this.player.file_sound_current,
-					file_sound_next: this.player.file_sound_next,
 				});
 			},
 			playerPositionUpdate(arg) {
@@ -152,6 +147,7 @@
 			playerVSUpdate(arg) {
 				this.player.sound_current.playbackRate = arg.speed;
 				this.player.sound_current.volume = arg.volume;
+				this.send_player_status_over_ipc();
 			},
 			playerControlCB(arg) {
 				switch (arg) {
@@ -170,6 +166,7 @@
 					default:
 						break;
 				}
+				this.send_player_status_over_ipc();
 			},
 			playerGotoCurrentBook() {
 				this.book_view_display_which_book = this.player.book;
@@ -181,6 +178,7 @@
 				if(this.player.file_sound_next !== "" && this.config.auto_continue_chapter) {
 					this.$electron.ipcRenderer.send("player_control_request", "next")
 				}
+				this.send_player_status_over_ipc();
 			},
 
 			player_toggle_pause() {
