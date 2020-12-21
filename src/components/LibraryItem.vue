@@ -4,7 +4,7 @@
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
 				<div style="position: relative; overflow: hidden; padding-bottom: 100%; display: flex; justify-content: center; background-color: #1f1f1f;">
-					<img class="img" style="position: absolute; top: 0px; height: 100%;" v-bind:src="purl" @error="has_errored_image = true"/>
+					<img class="img" style="position: absolute; top: 0px; height: 100%; max-height: 250px; max-width: 250px"  v-bind:src="purl" @error="has_errored_image = true"/>
 				</div>
 
 				<div class="card-body text-center text-white" style="padding-top: 6px;padding-bottom: 0px;padding-left: 7px;padding-right: 6px;background: #1f1f1f;">
