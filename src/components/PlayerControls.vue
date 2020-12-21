@@ -86,7 +86,7 @@
 					<span class="">Speed: {{range_speed_control}}%</span>
 				</div>
 				<div class="col col-lg-12 d-flex align-items-center" style="font-size: 20px;text-align: center;">
-					<a class="text-light" href="#" style="padding-right: 20px;">
+					<a class="no-underline text-light" href="#" style="padding-right: 20px;">
 						<i class="icon-speedometer"></i>
 					</a>
 					<input @dblclick="range_speed_control = 100" v-model="range_speed_control" class="slider slider-thumb-orange" type="range" min="25" max="250" step="15" style="height: 4px;" >
