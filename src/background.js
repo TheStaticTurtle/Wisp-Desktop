@@ -14,7 +14,7 @@ const os = require('os');
 
 const Sequelize = require("sequelize");
 
-const libraryPath = path.join(os.homedir(), "Music/WhisperBook/")
+const libraryPath = path.join(os.homedir(), "Music/Wisp/")
 if (!fs.existsSync(libraryPath)) fs.mkdirSync(libraryPath);
 
 const sequelize = new Sequelize({
@@ -44,12 +44,13 @@ const config = new Config(db);
 (async () => {
 	await sequelize.sync({ force: true })
 	await config.init()
+
+	require("./controllers/library").controller(db,config)
+	require("./controllers/audio").controller(db,config)
+	require("./controllers/config").controller(db,config)
 })();
 
 
-require("./controllers/library").controller(db,config)
-require("./controllers/audio").controller(db,config)
-require("./controllers/config").controller(db,config)
 
 protocol.registerSchemesAsPrivileged([
 	{ scheme: 'app', privileges: { secure: true, standard: true } }
