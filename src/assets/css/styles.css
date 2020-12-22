@@ -73,3 +73,9 @@
 .app-nav[aria-selected="true"] > h2 {
   border-bottom: 2px solid crimson !important;
 }
+
+.btn-no-hover:focus {
+  -webkit-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75) !important;
+  -moz-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75) !important;
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75) !important;
+}

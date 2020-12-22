@@ -1,11 +1,10 @@
 const { dialog, ipcMain } = require('electron')
 const path = require('path');
 const glob = require("glob");
-const fs = require('fs');
 const mm = require('music-metadata');
-const dataurl = require('dataurl');
 const md5 = require('md5');
 const pathEqual = require("path-equal").pathEqual
+const Vibrant = require('node-vibrant')
 
 const ALLOWED_EXTS = [".wav",".mp3",".ogg",".webm",".flac",".aac"];
 
@@ -131,7 +130,16 @@ function resyncLibraries(db, event, what_lib) {
 					}
 					chapter_ids.push(unique_chapter_id)
 
-					new_books[file_data.common.album].picture = file_data.common.picture !== null && file_data.common.hasOwnProperty("picture") ? (file_data.common.picture instanceof Object ? file_data.common.picture : file_data.common.picture[0]) : null;
+					if(file_data.common.picture !== null && file_data.common.hasOwnProperty("picture")) {
+						new_books[file_data.common.album].picture = file_data.common.picture instanceof Array ? file_data.common.picture[0] : file_data.common.picture
+						try {
+							const palette = await Vibrant.from(new_books[file_data.common.album].picture.data).getPalette()
+							new_books[file_data.common.album].border_color = palette.Vibrant.getHex()
+						} catch (err) {
+							sendNotification(event,err,null)
+							new_books[file_data.common.album].border_color = "#d9534f";
+						}
+					}
 					new_books[file_data.common.album].chapters.push({
 						unique_hash: unique_chapter_id,
 						file_path: walk_results[i],
@@ -152,7 +160,8 @@ function resyncLibraries(db, event, what_lib) {
 
 				for (let i = 0; i < books_organized.length; i++) {
 					let b = books_organized[i]
-					b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture[0].format+";base64,"+b.picture[0].data.toString('base64');
+					if(b.picture === null) b.border_color = "#d9534f";
+					b.picture_url = b.picture === null ? "assets/no_picture.png" : "data:"+b.picture.format+";base64,"+b.picture.data.toString('base64');
 					b.libraryId = libraries_result.id
 					await db.models.Book.create(b, {
 						include: [ db.models.Book.chapters ]

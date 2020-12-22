@@ -1,6 +1,6 @@
 <template>
 	<!--<div class="col-6 col-sm-3 col-md-3 col-lg-2 col-xl-2 align-self-start" style="padding: 5px;">-->
-		<button @click="click" class="btn btn-primary" type="button" style="padding: 1px; width: 100%">
+		<button @click="click" class="btn btn-danger btn-no-hover" type="button" style="padding: 1px; width: 100%;" v-bind:style="{'background-color': book.border_color, 'background-color': book.border_color, 'border-color': book.border_color}">
 			<div class="card" style="border-width: 1px;border-color: #151515; width: 100%">
 
 				<div style="position: relative; overflow: hidden; padding-bottom: 100%; display: flex; justify-content: center; background-color: #1f1f1f;">
