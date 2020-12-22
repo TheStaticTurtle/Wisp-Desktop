@@ -2,8 +2,8 @@
 	<div class="col-12 col-sm-9 col-md-9 col-lg-10 col-xl-10 offset-xl-0 d-flex flex-column visible" style="padding-top: 8px;padding-left: 16px;padding-right: 16px;">
 		<div class="row no-gutters d-flex flex-grow-1" style="overflow-y: scroll;height: 1px;margin-bottom: 15px;">
 			<div class="col" style="padding: 5px;">
-				<div class="row no-gutters d-flex flex-row">
-					<div class="col-3 d-flex align-items-center justify-content-center p-0 p-md-2" style="padding: 16px;">
+				<div class="row no-gutters d-flex flex-row pt-3 pt-sm-0">
+					<div class="col-12 col-sm-6 col-md-5 col-lg-3 col-xl-3 d-flex align-items-center justify-content-center p-0 p-md-2" style="padding: 16px;">
 						<img class="img-fluid" style="max-height: 250px; max-width: 250px" v-bind:src="book.picture_url">
 					</div>
 					<div class="col" style="padding-top: 16px;margin-left: 16px;">

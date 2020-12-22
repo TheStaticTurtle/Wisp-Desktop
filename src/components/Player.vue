@@ -1,5 +1,5 @@
 <template>
-	<div class="container-fluid d-flex flex-column" style="height: 100vh;">
+	<div class="container-fluid d-flex flex-column" style="height: 100vh;  overflow-x: hidden;">
 
 		<!--
 		TODO: Find a pure css version of displaying this f-king navigation bar properly. Just gave up here
