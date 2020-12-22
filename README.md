@@ -2,7 +2,7 @@
 Wisp is a NodeJS audiobook reader. It's using Electron and VueJS offering a great compatibility across platforms. It is still under development and anyone that wants to contribute to this project is welcome.
 Furthermore, it first started as a playground for me to learn electron and improve my VueJS so the code might not be up to everyone standard
 
-**Due to the current state of the project the database is reset at each launch this can easily be fixed by changing the `sequelize.sync` in the `background.js` file.**
+**When running in development mode, the database will reset at each launch. This, however is disabled will running in production.**
 
 # Launching / Building
 

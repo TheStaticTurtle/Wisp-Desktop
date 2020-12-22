@@ -6,7 +6,7 @@ import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const debugSequelize = require('debug')('wisp:sequelize')
 const debugElectron = require('debug')('wisp:electron')
 
-const isDevelopment = process.env.NODE_ENV !== 'production'
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 const path = require('path');
 const fs = require('fs');
@@ -42,7 +42,9 @@ const {Config} = require("./config")
 
 const config = new Config(db);
 (async () => {
-	await sequelize.sync({ force: true })
+	if(isDevelopment) await sequelize.sync({force: true})
+	else              await sequelize.sync()
+
 	await config.init()
 
 	require("./controllers/library").controller(db,config)
