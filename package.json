@@ -1,10 +1,14 @@
 {
-  "name": "wisp",
+  "name": "Wisp",
   "version": "1.0.0",
   "private": true,
-  "description": "A simple electron based audio book player",
+  "description": "Wisp is a cross-platform audiobook player that uses electron and VueJS at his core",
+  "homepage": "https://github.com/TheStaticTurtle/Wisp-Desktop",
   "author": {
     "name": "TheStaticTurtle"
+  },
+  "repository": {
+    "url": "https://github.com/TheStaticTurtle/Wisp-Desktop"
   },
   "scripts": {
     "serve": "vue-cli-service serve",

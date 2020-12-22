@@ -13,12 +13,18 @@ module.exports = {
 				"**/*"
 			],
 			builderOptions: {
+				appId: "fr.thestaticturtle.wisp_desktop",
+				productName: "Wisp",
 				win: {
 					icon: "public/icons/icon.png"
 				},
 				nsis: {
 					oneClick: false,
-					installerIcon : "public/icons/icon.ico",
+					createDesktopShortcut: true,
+					createStartMenuShortcut: true,
+					allowToChangeInstallationDirectory: true,
+					installerIcon: "public/icons/icon.ico",
+					license: "LICENSE"
 				}
 			}
 		}
