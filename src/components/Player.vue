@@ -163,6 +163,14 @@
 					case "next":
 						this.$electron.ipcRenderer.send("player_control_request", arg)
 						break;
+					case "fastbackward":
+						this.$electron.ipcRenderer.send("player_control_request", arg)
+						this.player.sound_current.currentTime -= this.config.jump_delay
+						break;
+					case "fastforward":
+						this.$electron.ipcRenderer.send("player_control_request", arg)
+						this.player.sound_current.currentTime += this.config.jump_delay
+						break;
 					default:
 						break;
 				}

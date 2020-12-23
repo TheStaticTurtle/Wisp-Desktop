@@ -14,6 +14,9 @@
 			<div class="container-fluid">
 				<div class="row" style="margin-top: 16px;">
 					<div class="col pt-0 " style="font-size: 20px;text-align: center;padding: 15px;">
+						<a @click="()=>{if(enable_controls) $emit('playerControl','fastbackward'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons pt-md-0" href="#" style="padding: 20px;">
+							-{{config.jump_delay}}s
+						</a>
 						<a @click="()=>{if(enable_controls) $emit('playerControl','previous');}" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons pt-md-0" href="#" style="padding: 20px;">
 							<i class="icon-control-start"></i>
 						</a>
@@ -22,6 +25,9 @@
 						</a>
 						<a @click="()=>{if(enable_controls) $emit('playerControl','next'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons pt-md-0" href="#" style="padding: 20px;">
 							<i class="icon-control-end"></i>
+						</a>
+						<a @click="()=>{if(enable_controls) $emit('playerControl','fastforward'); }" v-bind:class="{'disabled-link':!enable_controls, 'text-light':enable_controls}" class="no-underline control-buttons pt-md-0" href="#" style="padding: 20px;">
+							+{{config.jump_delay}}s
 						</a>
 					</div>
 				</div>
@@ -154,6 +160,7 @@
 
 		props: {
 			player: Object,
+			config: Object,
 			enable_controls: Boolean
 		},
 		data() {

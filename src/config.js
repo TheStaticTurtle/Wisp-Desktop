@@ -3,6 +3,7 @@ const config_default = {
 	"auto_continue_chapter": true,
 	"player_current_volume": 0.85,
 	"player_current_speed": 1,
+	"jump_delay": 10,
 
 	"status_playing": false,
 	"status_book_unique_hash": "",
