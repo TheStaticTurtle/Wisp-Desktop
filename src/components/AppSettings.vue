@@ -38,13 +38,13 @@
 
 		<div class="tab-content" id="pills-tabContent">
 			<div class="tab-pane fade show active container-fluid" id="settings-general" role="tabpanel" aria-labelledby="nav-settings-general">
-				<div class="row">
-					<div class="col-6">
-						<label for="auto_continue_chapter_check" class="form-check-label">Auto continue chapters</label>
-					</div>
-					<div class="col">
-						<bootstrap-toggle v-model="config.auto_continue_chapter" id="auto_continue_chapter_check" :options="{ on: 'Continue', off: 'Pause', onstyle: 'outline-success', offstyle: 'outline-warning', size: 'small'}" :disabled="false" />
-					</div>
+				<div class="row pb-2">
+					<div class="col-6"><label for="auto_continue_chapter_check" class="form-check-label">Auto continue chapters</label></div>
+					<div class="col"><bootstrap-toggle v-model="config.auto_continue_chapter" id="auto_continue_chapter_check" :options="{ on: 'Continue', off: 'Pause', onstyle: 'outline-success', offstyle: 'outline-warning', size: 'small'}" :disabled="false" /></div>
+				</div>
+				<div class="row pb-2">
+					<div class="col-6"><label for="jump_delay" class="form-check-label">Jump delay</label></div>
+					<div class="col"><input v-model.number="config.jump_delay" type="number" id="jump_delay" name="tentacles" min="5" max="100"></div>
 				</div>
 
 			</div>
@@ -155,12 +155,16 @@
 				hidden_files: [],
 				config: {
 					auto_continue_chapter: true,
+					jump_delay: 10,
 				}
 			}
 		},
 		watch: {
 			'config.auto_continue_chapter':  function (){
 				this.$electron.ipcRenderer.send("config_set", { key: "auto_continue_chapter", value: this.config.auto_continue_chapter })
+			},
+			'config.jump_delay':  function (){
+				this.$electron.ipcRenderer.send("config_set", { key: "jump_delay", value: this.config.jump_delay })
 			},
 		},
 		methods: {
