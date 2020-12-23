@@ -10,7 +10,7 @@
 
 				<div
 						v-for="(notification,index) in notifications"
-						v-bind:key="notification"
+						v-bind:key="notification.title+notification.text+(notification.collapse !== undefined ? notification.collapse : '')+index"
 						v-bind:class="{'alert-danger':notification.type==='error', 'alert-info':notification.type==='info', 'alert-warning':notification.type==='warn' }"
 						class="alert"
 						role="alert">

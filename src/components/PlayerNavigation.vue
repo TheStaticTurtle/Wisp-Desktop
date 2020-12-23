@@ -29,13 +29,15 @@
 		<div v-if="display_player_related" class="row d-none d-sm-block">
 			<div class="col" style="padding-bottom: 8px;padding-right: 8px;padding-left: 8px;">
 				<hr style="background: #ffffff;">
-				<img style="width: 100%;" v-bind:src="player.book.picture_url">
+				<img style="width: 100%;" v-bind:src="purl" @error="has_errored_image = true">
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+
+	import no_img from '../assets/img/no_image.png';
 
 	export default {
 		name: "PlayerNavigation",
@@ -56,7 +58,20 @@
 		props: {
 			display_player_related: Boolean,
 			player: Object,
-		}
+		},
+		computed: {
+			purl() {
+				return this.has_errored_image ? this.imp.no_img : this.player.book.picture_url;
+			}
+		},
+		data() {
+			return {
+				has_errored_image: false,
+				imp: {
+					no_img:no_img
+				}
+			}
+		},
 	}
 </script>
 
