@@ -175,7 +175,6 @@ function resyncLibraries(db, event, what_lib) {
 
 			reloadLibraries(db, event).then((b)=>{
 				resolve(b);
-				console.log(b.map(x=>{return x.name}))
 			})
 		}).catch(reject);
 	});
@@ -332,41 +331,41 @@ function controller(db, config) {
 
 	ipcMain.on("add_new_library",function (event, arg) {
 
-		dialog.showOpenDialog({properties: ['openDirectory']}).then(r => {
+		dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']}).then(async r => {
+			console.log(r)
 			if(r.canceled === true) return;
-			if(r.filePaths.length !== 1) return;
+			if(r.filePaths.length === 0) return;
 
 			startLoadingScreen(event);
 
-			db.models.Library.sync().then(() => {
-				db.models.Library.create({
-					path: r.filePaths[0],
-					books: []
-				}).then(function (new_lib) {
-					updateLoadingScreenText(event, "Starting to sync the new library");
-
-					resyncLibraries(db, event, new_lib).then(function (books) {
-						event.sender.send("library_update", books);
-						endLoadingScreen(event)
-					}).catch(function (err) {
-						endLoadingScreen(event,err,null);
-					})
-
-					getLibraries(db, event).then(function (l) {
-						event.sender.send("libraries_update", l);
-					}).catch(function (err) {
-						endLoadingScreen(event,err,null);
+			for (const filePath of r.filePaths) {
+				try {
+					await db.models.Library.create({
+						path: filePath,
+						books: []
 					});
-
-				}).catch(function () {
+				} catch (err) {
 					endLoadingScreen(event,null,{
 						type: "warn",
 						title:"This library already exist.",
 						text: "You can go to the settings to reload it.",
 					});
-				});
-			});
+				}
+			}
+			updateLoadingScreenText(event, "Starting to sync the new library");
 
+			resyncLibraries(db, event, null).then(function (books) {
+				event.sender.send("library_update", books);
+				endLoadingScreen(event)
+			}).catch(function (err) {
+				endLoadingScreen(event,err,null);
+			})
+
+			getLibraries(db, event).then(function (l) {
+				event.sender.send("libraries_update", l);
+			}).catch(function (err) {
+				endLoadingScreen(event,err,null);
+			});
 		})
 	});
 
