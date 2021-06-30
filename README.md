@@ -6,7 +6,7 @@ Furthermore, it first started as a playground for me to learn electron and impro
 
 # Launching / Building
 
-Thanks to the vue electron builder module launching the project is done with the command `npm electron:serve` and build the project is done with `npm electron:build`. But be warned I did not test build in a platform other than windows and tho some build options might be missing from the `vue.config.js` file
+Thanks to the vue electron builder module launching the project is done with the command `npm run electron:serve` and build the project is done with `npm run electron:build`. But be warned I did not test build in a platform other than windows and tho some build options might be missing from the `vue.config.js` file
 
 # File formats
 
